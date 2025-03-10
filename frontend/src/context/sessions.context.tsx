@@ -10,6 +10,7 @@ const SessionsContext = createContext<{
   getSession: (id: string) => Session | undefined;
   addMessage: (id: string, message: Message) => void;
   updateMessage: (id: string, message: Message) => void;
+  deleteSession: (id: string) => void;
 } | undefined>(undefined);
 
 // Create a provider component
@@ -41,8 +42,13 @@ export const SessionsProvider: React.FC<{ children: ReactNode }> = ({ children }
     return sessions.find((session) => session.id === id);
   }
 
+  function deleteSession(id: string) {
+    setSessions(sessions.filter((session) => session.id !== id));
+    localStorage.setItem('sessions', JSON.stringify(sessions.filter((session) => session.id !== id)));
+  }
+
   return (
-    <SessionsContext.Provider value={{ sessions, setSessions, addSession, getSession, addMessage, updateMessage }}>
+    <SessionsContext.Provider value={{ sessions, setSessions, addSession, getSession, addMessage, updateMessage, deleteSession }}>
       {children}
     </SessionsContext.Provider>
   );

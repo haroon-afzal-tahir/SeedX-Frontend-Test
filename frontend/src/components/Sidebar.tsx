@@ -9,7 +9,7 @@ import { IoCarSportSharp } from "react-icons/io5";
 import { useParams, useRouter } from "next/navigation";
 
 export const Sidebar = () => {
-  const { sessions, setSessions } = useSessions();
+  const { sessions, deleteSession } = useSessions();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { id } = useParams();
   const router = useRouter();
@@ -33,7 +33,7 @@ export const Sidebar = () => {
   const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setSessions(sessions.filter(session => session.id !== sessionId));
+    deleteSession(sessionId);
     // check if the deleted session is the current session
     if (id === sessionId) {
       router.push("/");
@@ -48,15 +48,18 @@ export const Sidebar = () => {
 
   return (
     <div className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2">
-      <Link href="/" className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}
-      ><IoCarSportSharp fontSize={20}/> SuperCar Assistant
+      <Link
+        href="/"
+        className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}
+      >
+        <IoCarSportSharp fontSize={20}/> SuperCar Assistant
       </Link>
       {sessions.length > 0 && (
         <>
           <hr className="my-2" />
           <div className="flex flex-col gap-2">
             {sessions.map((session) => (
-              <Link key={session.id} href={`/${session.id}`} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md hover:bg-sidebar-hover  w-full text-sm truncate ${id === session.id ? '!bg-sidebar-active' : ''}`}>
+              <Link key={session.id} href={`/${session.id}`} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md w-full text-sm truncate ${id === session.id ? 'bg-background' : 'hover:bg-sidebar-hover'}`}>
                 <span className={`truncate group-hover:ml-4 transition-all ${id === session.id ? '!ml-6' : ''}`}>
                   {session.name}
                 </span>
@@ -70,10 +73,10 @@ export const Sidebar = () => {
                   </button>
                   
                   {openMenuId === session.id && (
-                    <div className="absolute right-0 top-8 w-36 bg-sidebar shadow-lg rounded-md py-1 z-10">
+                    <div className="absolute right-0 top-8 w-36 bg-sidebar-active shadow-lg rounded-md z-10">
                       <button 
                         onClick={(e) => handleDeleteSession(session.id, e)}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm hover:bg-sidebar-hover text-red-500 cursor-pointer"
+                        className="flex items-center gap-2 w-full px-3 py-2 text-left rounded-md text-sm hover:bg-sidebar-hover text-red-500 cursor-pointer"
                       >
                         <MdDelete className="text-red-500" />
                         Delete
