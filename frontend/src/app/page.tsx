@@ -6,7 +6,7 @@ import { PiPaperPlaneRightFill } from "react-icons/pi";
 
 export default function Home() {
   const router = useRouter();
-  const { setSessions } = useSessions();
+  const { sessions, addSession } = useSessions();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,24 +15,19 @@ export default function Home() {
     
     const uuid = crypto.randomUUID();
 
-    setSessions((prevSessions) => 
-      [
-        ...prevSessions, 
-        { 
-          id: uuid,
-          name: "Session " + uuid,
+    addSession({ 
+      id: uuid,
+      name: `Session ${sessions.length + 1}`,
+      createdAt: new Date(),
+      messages: [
+        {
+          id: crypto.randomUUID(),
+          content: message,
           createdAt: new Date(),
-          messages: [
-            {
-              id: crypto.randomUUID(),
-              content: message,
-              createdAt: new Date(),
-              isUser: true,
-            }
-          ]
+          isUser: true,
         }
       ]
-    );
+    });
 
     router.push(`/${uuid}`, { scroll: true });
 

@@ -13,7 +13,7 @@ export const Sidebar = () => {
           <hr className="my-2" />
           <div className="flex flex-col gap-2">
             {sessions.map((session) => (
-              <Link key={session.id} href={`/${session.id}`} className="p-2 rounded-md hover:bg-background w-full text-sm">
+              <Link key={session.id} href={`/${session.id}`} className="p-2 rounded-md hover:bg-background w-full text-sm truncate">
                 {session.name}
               </Link>
             ))}
