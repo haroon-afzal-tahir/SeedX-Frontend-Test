@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
-import { getSessions } from "@/functions/sessions.api";
+import { SessionsProvider } from "@/context/sessions.context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,24 +19,25 @@ export const metadata: Metadata = {
   description: "SuperCar Virtual Sales Assistant",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const sessions = await getSessions();
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full w-full`}
-      >
-        <main className="flex h-[100dvh] w-full">
-          <Sidebar sessions={sessions} />
-          <div className="flex-1 max-w-3xl flex items-center justify-center flex-col gap-2 mx-auto">
-            {children}
-          </div>
-        </main>
-      </body>
-    </html>
+    <SessionsProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased h-full w-full`}
+        >
+          <main className="flex h-[100dvh] w-full">
+            <Sidebar />
+            <div className="flex-1 max-w-3xl flex items-center justify-center flex-col gap-2 mx-auto">
+              {children}
+            </div>
+          </main>
+        </body>
+      </html>
+    </SessionsProvider>
   );
 }
