@@ -1,0 +1,17 @@
+frontend/.files
+
+__pycache__/
+
+.pyc
+
+*.pyc
+
+.idea
+
+backend/.env
+
+.DS_Store
+
+*.venv
+
+*.env
