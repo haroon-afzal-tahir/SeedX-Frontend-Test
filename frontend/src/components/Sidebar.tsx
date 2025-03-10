@@ -41,10 +41,10 @@ export const Sidebar = () => {
     e.stopPropagation();
     setOpenMenuId(openMenuId === id ? null : id);
   };
-  
+
   return (
     <div className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2">
-      <Link href="/" className="p-2 rounded-md transition-all hover:gap-6 hover:bg-background flex justify-center items-center gap-2 w-full text-sm text-center"
+      <Link href="/" className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}
       ><IoCarSportSharp fontSize={20}/> SuperCar Assistant
       </Link>
       {sessions.length > 0 && (
