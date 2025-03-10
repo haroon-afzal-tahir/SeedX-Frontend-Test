@@ -12,6 +12,7 @@ export const Sidebar = () => {
   const { sessions, setSessions } = useSessions();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { id } = useParams();
+  const router = useRouter();
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -29,11 +30,14 @@ export const Sidebar = () => {
     };
   }, [openMenuId]);
 
-  const handleDeleteSession = (id: string, e: React.MouseEvent) => {
+  const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setSessions(sessions.filter(session => session.id !== id));
-    setOpenMenuId(null);
+    setSessions(sessions.filter(session => session.id !== sessionId));
+    // check if the deleted session is the current session
+    if (id === sessionId) {
+      router.push("/");
+    }
   };
 
   const toggleMenu = (id: string, e: React.MouseEvent) => {
@@ -52,7 +56,7 @@ export const Sidebar = () => {
           <hr className="my-2" />
           <div className="flex flex-col gap-2">
             {sessions.map((session) => (
-              <Link key={session.id} href={`/${session.id}`} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md hover:bg-neutral-200  w-full text-sm truncate ${id === session.id ? '!bg-neutral-300' : ''}`}>
+              <Link key={session.id} href={`/${session.id}`} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md hover:bg-sidebar-hover  w-full text-sm truncate ${id === session.id ? '!bg-sidebar-active' : ''}`}>
                 <span className={`truncate group-hover:ml-4 transition-all ${id === session.id ? '!ml-6' : ''}`}>
                   {session.name}
                 </span>
@@ -60,16 +64,16 @@ export const Sidebar = () => {
                 <div className="relative menu-container">
                   <button 
                     onClick={(e) => toggleMenu(session.id, e)} 
-                    className={`hover:bg-neutral-200 group-hover:opacity-100 ${openMenuId === session.id ? 'opacity-100' : 'opacity-0'} transition-all cursor-pointer rounded-md p-1`}
+                    className={`hover:bg-sidebar-hover group-hover:opacity-100 ${openMenuId === session.id ? 'opacity-100' : 'opacity-0'} transition-all cursor-pointer rounded-md p-1`}
                   >
                     <MdMoreHoriz />
                   </button>
                   
                   {openMenuId === session.id && (
-                    <div className="absolute right-0 top-8 w-36 bg-white shadow-lg rounded-md py-1 z-10">
+                    <div className="absolute right-0 top-8 w-36 bg-sidebar shadow-lg rounded-md py-1 z-10">
                       <button 
                         onClick={(e) => handleDeleteSession(session.id, e)}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-500"
+                        className="flex items-center gap-2 w-full px-3 py-2 text-left text-sm hover:bg-sidebar-hover text-red-500 cursor-pointer"
                       >
                         <MdDelete className="text-red-500" />
                         Delete

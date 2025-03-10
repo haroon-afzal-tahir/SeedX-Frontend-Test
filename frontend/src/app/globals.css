@@ -4,12 +4,16 @@
   --background: #ffffff;
   --foreground: #171717;
   --sidebar: #eeeeee;
+  --sidebar-hover: #e5e5e5;
+  --sidebar-active: #d4d4d4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-sidebar: var(--sidebar);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-active: var(--sidebar-active);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,6 +23,8 @@
     --background: #0a0a0a;
     --foreground: #ededed;
     --sidebar: #1f1f1f;
+    --sidebar-hover: #2f2f2f;
+    --sidebar-active: #3f3f3f;
   }
 }
 

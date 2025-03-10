@@ -9,6 +9,7 @@ const SessionsContext = createContext<{
   addSession: (session: Session) => void;
   getSession: (id: string) => Session | undefined;
   addMessage: (id: string, message: Message) => void;
+  updateMessage: (id: string, message: Message) => void;
 } | undefined>(undefined);
 
 // Create a provider component
@@ -31,12 +32,17 @@ export const SessionsProvider: React.FC<{ children: ReactNode }> = ({ children }
     localStorage.setItem('sessions', JSON.stringify(sessions.map((s) => s.id === id ? { ...s, messages: [...s.messages, message] } : s)));
   }
 
+  function updateMessage(id: string, message: Message) {
+    setSessions((prevSessions) => prevSessions.map((s) => s.id === id ? { ...s, messages: [...s.messages, message] } : s));
+    localStorage.setItem('sessions', JSON.stringify(sessions.map((s) => s.id === id ? { ...s, messages: [...s.messages, message] } : s)));
+  }
+
   function getSession(id: string) {
     return sessions.find((session) => session.id === id);
   }
 
   return (
-    <SessionsContext.Provider value={{ sessions, setSessions, addSession, getSession, addMessage }}>
+    <SessionsContext.Provider value={{ sessions, setSessions, addSession, getSession, addMessage, updateMessage }}>
       {children}
     </SessionsContext.Provider>
   );
