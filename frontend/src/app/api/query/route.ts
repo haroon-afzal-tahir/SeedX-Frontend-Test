@@ -5,36 +5,63 @@ export async function GET(req: NextRequest) {
   const session_id = searchParams.get("session_id");
   const query = searchParams.get("query");
 
-  const response = await fetch(
-    `${process.env.API_URL}/query?${searchParams.toString()}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "text/event-stream",
-      },
-      body: JSON.stringify({
-        query: query,
-        session_id: session_id,
-      }),
-    }
-  );
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        const response = await fetch(
+          `${process.env.API_URL}/query?${searchParams.toString()}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "text/event-stream",
+            },
+            body: JSON.stringify({
+              query: query,
+              session_id: session_id,
+            }),
+          }
+        );
 
-  // Remove or comment out console.log statements as they might interfere with the stream
-  if (!response.ok) {
-    return NextResponse.json(
-      { error: "Upstream request failed" },
-      { status: response.status }
-    );
-  }
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error("API error message:", errorBody);
+          controller.enqueue("Something went wrong...");
+          controller.close();
+          return;
+        }
 
-  return new NextResponse(response.body, {
+        const reader = response.body?.getReader();
+        if (!reader) {
+          controller.enqueue("Something went wrong...");
+          controller.close();
+          return;
+        }
+
+        // Read the response body
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const text = new TextDecoder().decode(value);
+          controller.enqueue(new TextEncoder().encode(text));
+        }
+
+        reader.releaseLock();
+      } catch (error) {
+        controller.error(error);
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new NextResponse(stream, {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
-      "Content-Encoding": "none",
     },
+    status: 200,
   });
 }

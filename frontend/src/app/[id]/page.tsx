@@ -68,10 +68,11 @@ export default function Chat() {
 
   // Use the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (data) => {
+    console.log("Data:", data);
     updateMessage(id as string, {
       id: assistantMessageId.current,
       createdAt: new Date(),
-      content: data.message,
+      content: data.data || "",
       isUser: false,
     });
   });
