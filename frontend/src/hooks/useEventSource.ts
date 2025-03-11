@@ -22,46 +22,31 @@ export function useEventSource(
     } else {
       requestUrl = url;
     }
-    try {
-      // Create new EventSource instance
-      const eventSource = new EventSource(requestUrl);
-      eventSourceRef.current = eventSource;
 
-      eventSource.onmessage = (event: MessageEvent) => {
-        console.log("Received event: ", event.data);
-        try {
-          const data = JSON.parse(event.data);
-          onMessage(data);
-        } catch (error) {
-          console.error("Failed to parse event data:", error);
-        }
-      };
+    const eventSource = new EventSource(requestUrl);
+    eventSourceRef.current = eventSource;
 
-      eventSource.onerror = (event: Event) => {
-        console.error("EventSource error:", event);
-        if (eventSourceRef.current) {
-          closeEventSource(eventSourceRef.current);
-          closeEventSource(eventSource);
-          eventSourceRef.current = null;
-        }
-      };
+    eventSource.addEventListener("message", (event: MessageEvent) => {
+      console.log("Received event: ", event.data);
+      try {
+        const data = JSON.parse(event.data);
+        onMessage(data);
+      } catch (error) {
+        console.error("Failed to parse event data:", error);
+      }
+    });
 
-      eventSource.onopen = (event: Event) => {
-        console.log("EventSource connection opened:", event);
-      };
+    eventSource.addEventListener("error", (event: Event) => {
+      console.error("EventSource error:", event);
+      eventSource.close();
+      eventSourceRef.current = null;
+    });
 
-      // Cleanup function
-      return () => {
-        if (eventSourceRef.current) {
-          closeEventSource(eventSourceRef.current);
-          closeEventSource(eventSource);
-          eventSourceRef.current = null;
-        }
-      };
-    } catch (error) {
-      console.error("Failed to create EventSource:", error);
-      return undefined;
-    }
+    // Simplified cleanup function
+    return () => {
+      eventSource.close();
+      eventSourceRef.current = null;
+    };
   }, [url, onMessage]);
 
   return eventSourceRef.current;

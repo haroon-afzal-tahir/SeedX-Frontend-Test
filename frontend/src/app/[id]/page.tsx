@@ -48,7 +48,7 @@ export default function Chat() {
       session_id: id as string,
       query: message,
     });
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/query?${urlParams.toString()}`;
+    const apiUrl = `api/query?${urlParams.toString()}`;
 
     // Set the URL for EventSource
     setEventSourceUrl(apiUrl);
@@ -61,7 +61,7 @@ export default function Chat() {
         session_id: id as string,
         query: session.messages[0].content,
       });
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/query?${urlParams.toString()}`;
+      const apiUrl = `api/query?${urlParams.toString()}`;
       setEventSourceUrl(apiUrl);
     }
   }, [id, session]);

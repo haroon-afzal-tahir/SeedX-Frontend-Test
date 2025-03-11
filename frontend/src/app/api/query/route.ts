@@ -2,20 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-  const message = searchParams.get("message");
+  const session_id = searchParams.get("session_id");
+  const query = searchParams.get("query");
 
-  const response = await fetch(`${process.env.API_URL}/query`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "text/event-stream",
-    },
-    body: JSON.stringify({
-      query: message,
-      session_id: id,
-    }),
-  });
+  const response = await fetch(
+    `${process.env.API_URL}/query?${searchParams.toString()}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+      },
+      body: JSON.stringify({
+        query: query,
+        session_id: session_id,
+      }),
+    }
+  );
 
   // Remove or comment out console.log statements as they might interfere with the stream
   if (!response.ok) {
@@ -31,6 +34,7 @@ export async function GET(req: NextRequest) {
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
+      "Content-Encoding": "none",
     },
   });
 }
