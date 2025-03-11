@@ -1,21 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 
-function parseResponse(str: string) {
+function parseResponse(str: string): string {
   const lines = str.split("\n");
-  const result: { [key: string]: string } = {};
-
-  lines.forEach((line) => {
-    const [key, value] = line.split(":").map((s) => s.trim());
-    result[key] = value;
+  const data = lines.map((line) => {
+    const [key, value] = line.split(": ");
+    if (key === "event" && value.trim() === "chunk") {
+      return lines.slice(lines.indexOf(line) + 1).join("");
+    }
   });
-
-  return result;
+  return data.join("");
 }
 
 export function useEventSource(
   url: string | null,
-  onMessage: (data: any) => void
+  onMessage: (data: string) => void
 ) {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,26 +44,29 @@ export function useEventSource(
     };
 
     eventSource.onmessage = (event) => {
-      console.log("Raw event data:", event.data);
-      try {
-        if (event.data.startsWith(": ping")) {
-          return;
-        }
-        // Try to pass the raw data if parsing fails
-        let parsed;
-        try {
-          parsed = parseResponse(event.data);
-        } catch (parseErr) {
-          console.log("Parsing failed, using raw data");
-          parsed = event.data;
-        }
-        console.log("Processed data:", parsed);
-        onMessage(parsed);
-      } catch (err) {
-        console.error("Failed to handle message:", err);
-        // Still try to send the raw data
-        onMessage(event.data);
-      }
+      console.log("Raw event data:", event);
+      const parsed = parseResponse(event.data);
+      console.log(`Parsed data: "${parsed}"`);
+      onMessage(parsed);
+      // try {
+      //   if (event.data.startsWith(": ping")) {
+      //     return;
+      //   }
+      //   // Try to pass the raw data if parsing fails
+      //   let parsed;
+      //   try {
+      //     parsed = parseResponse(event.data);
+      //   } catch (parseErr) {
+      //     console.log("Parsing failed, using raw data");
+      //     parsed = event.data;
+      //   }
+      //   console.log("Processed data:", parsed);
+      //   onMessage(parsed);
+      // } catch (err) {
+      //   console.error("Failed to handle message:", err);
+      //   // Still try to send the raw data
+      //   onMessage(event.data);
+      // }
     };
 
     eventSource.onerror = (event) => {

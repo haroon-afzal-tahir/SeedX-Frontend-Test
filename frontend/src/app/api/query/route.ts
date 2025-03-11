@@ -40,9 +40,16 @@ export async function GET(req: NextRequest) {
 
         // Read the response body
         while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          controller.enqueue(value);
+          try {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const text = new TextDecoder().decode(value);
+            controller.enqueue(`data: ${text}\n\n`);
+          } catch (readError) {
+            console.error("Error reading stream:", readError);
+            controller.error(readError);
+            break;
+          }
         }
 
         reader.releaseLock();
