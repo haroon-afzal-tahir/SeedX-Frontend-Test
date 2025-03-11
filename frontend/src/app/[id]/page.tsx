@@ -3,7 +3,7 @@
 import { Message } from "@/components/Message";
 import { useSessions } from "@/context/sessions.context";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PiPaperPlaneRightFill } from "react-icons/pi";
 import { useEventSource } from "@/hooks/useEventSource"; // Import the custom hook
 
@@ -11,59 +11,54 @@ export default function Chat() {
   const { id } = useParams();
   const { getSession, addMessage, updateMessage } = useSessions();
   const router = useRouter();
-  const currentMessageRef = useRef<string>("");
+  const assistantMessageId = useRef<string>("");
+  const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
 
   const session = getSession(id as string);
 
-  if (!session || session.messages.length === 0) {
-    router.push("/");
-  }
+  useEffect(() => {
+    if (!session || session.messages.length === 0) {
+      router.push("/");
+    }
+  }, [session, router]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const message = formData.get("message") as string;
 
-    currentMessageRef.current = message;
-
+    // user message
     addMessage(id as string, {
-      id: currentMessageRef.current,
+      id: crypto.randomUUID(),
       createdAt: new Date(),
       content: message,
       isUser: true,
     });
 
-    // Send the message to the server
-    fetch(`/api/query`, {
-      method: "POST",
-      body: JSON.stringify({ message, id })
-    }).catch((error) => {
-      console.error(error);
+    assistantMessageId.current = crypto.randomUUID();
+    // assistant message
+    addMessage(id as string, {
+      id: assistantMessageId.current,
+      createdAt: new Date(),
+      content: "",
+      isUser: false,
     });
+
+    // Set the URL for EventSource
+    setEventSourceUrl(`/api/query?id=${id}&message=${encodeURIComponent(message)}`);
   }
 
   useEffect(() => {
     // Initial API call to fetch the system response if there's only one message
     if (session && session.messages.length === 1) {
-      fetch(`/api/query`, {
-        method: "POST",
-        body: JSON.stringify({ id, message: session.messages[0].content })
-      }).then((res) => res.json()).then((data) => {
-        currentMessageRef.current = data.message;
-        addMessage(id as string, {
-          id: currentMessageRef.current,
-          createdAt: new Date(),
-          content: data.message,
-          isUser: false,
-        });
-      });
+      setEventSourceUrl(`/api/query?id=${id}&message=${encodeURIComponent(session.messages[0].content)}`);
     }
-  }, [id, session, addMessage]);
+  }, [id, session]);
 
   // Use the custom hook to handle EventSource
-  useEventSource(`/api/query/${id}`, (data) => {
+  useEventSource(eventSourceUrl, (data) => {
     updateMessage(id as string, {
-      id: currentMessageRef.current,
+      id: assistantMessageId.current,
       createdAt: new Date(),
       content: data.message,
       isUser: false,
@@ -81,7 +76,7 @@ export default function Chat() {
       <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg w-full relative p-4">
         <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
 
-        <button type="submit" className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
+        <button type="submit" disabled={!assistantMessageId.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
           <PiPaperPlaneRightFill className="text-background" />
         </button>
       </form>
