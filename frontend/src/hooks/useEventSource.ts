@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
 import { useEffect, useRef } from "react";
 
 export function useEventSource(
   url: string | null,
   onMessage: (data: any) => void
 ) {
+  function closeEventSource(es: EventSource) {
+    if (es.readyState === EventSource.OPEN) {
+      es.close();
+    }
+  }
   const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
@@ -25,6 +28,7 @@ export function useEventSource(
       eventSourceRef.current = eventSource;
 
       eventSource.onmessage = (event: MessageEvent) => {
+        console.log("Received event: ", event.data);
         try {
           const data = JSON.parse(event.data);
           onMessage(data);
@@ -34,9 +38,10 @@ export function useEventSource(
       };
 
       eventSource.onerror = (event: Event) => {
-        console.error("EventSource failed:", event);
+        console.error("EventSource error:", event);
         if (eventSourceRef.current) {
-          eventSourceRef.current.close();
+          closeEventSource(eventSourceRef.current);
+          closeEventSource(eventSource);
           eventSourceRef.current = null;
         }
       };
@@ -48,7 +53,8 @@ export function useEventSource(
       // Cleanup function
       return () => {
         if (eventSourceRef.current) {
-          eventSourceRef.current.close();
+          closeEventSource(eventSourceRef.current);
+          closeEventSource(eventSource);
           eventSourceRef.current = null;
         }
       };

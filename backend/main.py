@@ -68,6 +68,11 @@ async def query_endpoint(payload: QueryRequest = Depends(), llm: BaseLLM = Depen
     """
     Query the agent with a text input.
     """
+    headers = {
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'text/event-stream',
+        'Connection': 'keep-alive'
+    }
 
     session_id = payload.session_id
     query = payload.query
@@ -78,28 +83,16 @@ async def query_endpoint(payload: QueryRequest = Depends(), llm: BaseLLM = Depen
         input=query
     )
 
-
     chat_history = get_chat_history(session_id)
 
     if not chat_history.messages:
         chat_history.add_system_message(AGENT_PROMPT)
 
-    # full_query = f"""
-    # <current_user_location>
-    # "account_id": {account},
-    # "project_id": {project}
-    # </current_user_location>
-    # <query>
-    # "{query}"
-    # </query>
-    # """
-
     chat_history.add_user_message(query)
 
-    #generator = llm.async_stream_inference(chat_history)
     generator = get_generator(llm, fallback_llm, chat_history)
     serialized_generator = serialize_stream_events(generator)
-    return EventSourceResponse(serialized_generator)
+    return EventSourceResponse(serialized_generator, headers=headers)
 
 
 
