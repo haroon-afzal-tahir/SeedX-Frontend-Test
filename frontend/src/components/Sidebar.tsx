@@ -13,7 +13,7 @@ export const Sidebar = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { id } = useParams();
   const router = useRouter();
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (openMenuId !== null) {
@@ -23,7 +23,7 @@ export const Sidebar = () => {
         }
       }
     };
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -52,7 +52,7 @@ export const Sidebar = () => {
         href="/"
         className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}
       >
-        <IoCarSportSharp fontSize={20}/> SuperCar Assistant
+        <IoCarSportSharp fontSize={20} /> SuperCar Assistant
       </Link>
       {sessions.length > 0 && (
         <>
@@ -65,18 +65,18 @@ export const Sidebar = () => {
                 </span>
 
                 <div className="relative menu-container">
-                  <button 
-                    onClick={(e) => toggleMenu(session.id, e)} 
+                  <button
+                    onClick={(e) => toggleMenu(session.id, e)}
                     className={`hover:bg-sidebar-hover group-hover:opacity-100 ${openMenuId === session.id ? 'opacity-100' : 'opacity-0'} transition-all cursor-pointer rounded-md p-1`}
                   >
                     <MdMoreHoriz />
                   </button>
-                  
+
                   {openMenuId === session.id && (
-                    <div className="absolute right-0 top-8 w-36 bg-sidebar-active shadow-lg rounded-md z-10">
-                      <button 
+                    <div className="absolute right-0 top-8 w-36 bg-background shadow-lg rounded-md z-10">
+                      <button
                         onClick={(e) => handleDeleteSession(session.id, e)}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-left rounded-md text-sm hover:bg-sidebar-hover text-red-500 cursor-pointer"
+                        className="flex items-center gap-2 w-full px-3 py-2 text-left rounded-md text-sm text-red-500 cursor-pointer"
                       >
                         <MdDelete className="text-red-500" />
                         Delete
