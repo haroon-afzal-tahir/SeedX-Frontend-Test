@@ -11,7 +11,10 @@ export default function Chat() {
   const { id } = useParams();
   const { getSession, addMessage, updateMessage } = useSessions();
   const router = useRouter();
-  const assistantMessageId = useRef<string>("");
+  const [assistantContext, setAssistantContext] = useState({
+    messageId: "",
+    content: "",
+  });
   const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
 
   const session = getSession(id as string);
@@ -21,6 +24,28 @@ export default function Chat() {
       router.push("/");
     }
   }, [session, router]);
+
+  function addAssistantMessage() {
+    const assistantMessageId = crypto.randomUUID();
+    setAssistantContext({ messageId: assistantMessageId, content: "" });
+    addMessage(id as string, {
+      id: assistantMessageId,
+      createdAt: new Date(),
+      content: "",
+      isUser: false,
+    });
+  }
+
+  function updateAssistantContext(content: string) {
+    setAssistantContext({ messageId: assistantContext.messageId, content });
+    updateMessage(id as string, {
+      id: assistantContext.messageId,
+      createdAt: new Date(),
+      content: `${assistantContext.content}${content}`,
+      isUser: false,
+    });
+  }
+
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,10 +60,14 @@ export default function Chat() {
       isUser: true,
     });
 
-    assistantMessageId.current = crypto.randomUUID();
+
     // assistant message
+    let assistantMessageId = crypto.randomUUID();
+
+    setAssistantContext({ messageId: assistantMessageId, content: "" });
+
     addMessage(id as string, {
-      id: assistantMessageId.current,
+      id: assistantMessageId,
       createdAt: new Date(),
       content: "",
       isUser: false,
@@ -62,19 +91,20 @@ export default function Chat() {
         query: session.messages[0].content,
       });
       const apiUrl = `api/query?${urlParams.toString()}`;
+      addAssistantMessage();
       setEventSourceUrl(apiUrl);
     }
   }, [id, session]);
 
   // Use the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
-    console.log("Data:", message);
-    // updateMessage(id as string, {
-    //   id: assistantMessageId.current,
-    //   createdAt: new Date(),
-    //   content: `${message}`,
-    //   isUser: false,
-    // });
+    if (message.event === "chunk") {
+      console.log({
+        messageId: assistantContext.messageId,
+        content: `${assistantContext.content}${message.data}`,
+      });
+      updateAssistantContext(message.data);
+    }
   });
 
   return (
