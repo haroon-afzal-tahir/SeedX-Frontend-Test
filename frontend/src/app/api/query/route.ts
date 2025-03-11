@@ -42,8 +42,7 @@ export async function GET(req: NextRequest) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const text = new TextDecoder().decode(value);
-          controller.enqueue(new TextEncoder().encode(text));
+          controller.enqueue(value);
         }
 
         reader.releaseLock();

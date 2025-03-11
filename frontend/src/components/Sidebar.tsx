@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 
 export const Sidebar = () => {
   const { sessions, deleteSession } = useSessions();
+  const [mounted, setMounted] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { id } = useParams();
   const router = useRouter();
@@ -46,6 +47,10 @@ export const Sidebar = () => {
     setOpenMenuId(openMenuId === id ? null : id);
   };
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2">
       <Link
@@ -54,7 +59,7 @@ export const Sidebar = () => {
       >
         <IoCarSportSharp fontSize={20} /> SuperCar Assistant
       </Link>
-      {sessions.length > 0 && (
+      {mounted && sessions.length > 0 && (
         <>
           <hr className="my-2" />
           <div className="flex flex-col gap-2">
