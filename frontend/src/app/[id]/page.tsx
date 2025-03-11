@@ -44,14 +44,25 @@ export default function Chat() {
       isUser: false,
     });
 
+    const urlParams = new URLSearchParams({
+      session_id: id as string,
+      query: message,
+    });
+    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/query?${urlParams.toString()}`;
+
     // Set the URL for EventSource
-    setEventSourceUrl(`/api/query?id=${id}&message=${encodeURIComponent(message)}`);
+    setEventSourceUrl(apiUrl);
   }
 
   useEffect(() => {
     // Initial API call to fetch the system response if there's only one message
     if (session && session.messages.length === 1) {
-      setEventSourceUrl(`/api/query?id=${id}&message=${encodeURIComponent(session.messages[0].content)}`);
+      const urlParams = new URLSearchParams({
+        session_id: id as string,
+        query: session.messages[0].content,
+      });
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/query?${urlParams.toString()}`;
+      setEventSourceUrl(apiUrl);
     }
   }, [id, session]);
 
@@ -76,7 +87,7 @@ export default function Chat() {
       <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg w-full relative p-4">
         <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
 
-        <button type="submit" disabled={!assistantMessageId.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
+        <button type="submit" className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
           <PiPaperPlaneRightFill className="text-background" />
         </button>
       </form>

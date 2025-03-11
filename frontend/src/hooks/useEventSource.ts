@@ -20,15 +20,11 @@ export function useEventSource(
       requestUrl = url;
     }
     try {
-      console.log("requestUrl", requestUrl);
       // Create new EventSource instance
-      const eventSource = new EventSource(requestUrl, {
-        withCredentials: true,
-      });
+      const eventSource = new EventSource(requestUrl);
       eventSourceRef.current = eventSource;
 
-      // Add message handler
-      const messageHandler = (event: MessageEvent) => {
+      eventSource.onmessage = (event: MessageEvent) => {
         try {
           const data = JSON.parse(event.data);
           onMessage(data);
@@ -37,23 +33,24 @@ export function useEventSource(
         }
       };
 
-      eventSource.onmessage = messageHandler;
-
-      // Add error handler
-      const errorHandler = (event: Event) => {
+      eventSource.onerror = (event: Event) => {
         console.error("EventSource failed:", event);
-        eventSource.close();
-        eventSourceRef.current = null;
+        if (eventSourceRef.current) {
+          eventSourceRef.current.close();
+          eventSourceRef.current = null;
+        }
       };
 
-      eventSource.onerror = errorHandler;
+      eventSource.onopen = (event: Event) => {
+        console.log("EventSource connection opened:", event);
+      };
 
       // Cleanup function
       return () => {
-        eventSource.removeEventListener("message", messageHandler);
-        eventSource.removeEventListener("error", errorHandler);
-        eventSource.close();
-        eventSourceRef.current = null;
+        if (eventSourceRef.current) {
+          eventSourceRef.current.close();
+          eventSourceRef.current = null;
+        }
       };
     } catch (error) {
       console.error("Failed to create EventSource:", error);

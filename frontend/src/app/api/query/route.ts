@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Accept: "text/event-stream",
     },
     body: JSON.stringify({
       query: message,
@@ -16,9 +17,7 @@ export async function GET(req: NextRequest) {
     }),
   });
 
-  console.log("response", response);
-
-  // Verify the response status
+  // Remove or comment out console.log statements as they might interfere with the stream
   if (!response.ok) {
     return NextResponse.json(
       { error: "Upstream request failed" },
@@ -26,24 +25,12 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Verify that we received an SSE response
-  const contentType = response.headers.get("content-type");
-  console.log("contentType", contentType);
-  if (!contentType?.includes("text/event-stream")) {
-    return NextResponse.json(
-      { error: "Invalid response format from upstream" },
-      { status: 500 }
-    );
-  }
-
-  console.log("response.body", response.body);
-
-  // Forward the SSE response with appropriate headers
   return new NextResponse(response.body, {
     headers: {
-      "Content-Type": "text/event-stream; charset=utf-8",
+      "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }

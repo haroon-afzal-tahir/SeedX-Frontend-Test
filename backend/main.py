@@ -1,6 +1,6 @@
 import copy
 
-from fastapi import FastAPI, Depends, APIRouter
+from fastapi import FastAPI, Depends, APIRouter, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -45,26 +45,26 @@ def get_chat_history(session_id: str) -> ChatHistory:
 router = APIRouter()
 
 async def get_generator(llm, fallback_llm, chat_history):
-
     clean_chat_history = copy.deepcopy(chat_history)
 
-    #try:
-    async for event in llm.async_stream_inference(chat_history):
-        yield event
-    # except Exception as e:
-    #     print(f"Error with main LLM: {str(e)}")
-    #     async for event in fallback_llm.async_stream_inference(clean_chat_history):
-    #         yield event
+    try:
+        async for event in llm.async_stream_inference(chat_history):
+            yield event
+    except Exception as e:
+        print(f"Error with main LLM: {str(e)}")
+        async for event in fallback_llm.async_stream_inference(clean_chat_history):
+            yield event
 
 
 
 class QueryRequest(BaseModel):
-    query: str
-    session_id: str
+    query: str = Query(..., description="The query to be sent to the agent")
+    session_id: str = Query(..., description="The session ID to be used for the query")
 
 
 @router.post("/query")
-async def query_endpoint(payload: QueryRequest, llm: BaseLLM = Depends(get_main_llm), fallback_llm: BaseLLM = Depends(get_fallback_llm)):
+@router.get("/query")
+async def query_endpoint(payload: QueryRequest = Depends(), llm: BaseLLM = Depends(get_main_llm), fallback_llm: BaseLLM = Depends(get_fallback_llm)):
     """
     Query the agent with a text input.
     """
