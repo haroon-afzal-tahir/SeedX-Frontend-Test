@@ -114,11 +114,11 @@ export default function Chat() {
   // Use the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
     // Only process messages if we're still on this route
-    if (message.event === "chunk" || message.event === "message") {
-      console.log("Message:", message);
+    if (message.event === "chunk") {
       updateAssistantContext(message.data);
     } else if (message.event === "end") {
       // Reset processing state when the response is complete
+      console.log("End:", message);
       processingRef.current = false;
       setEventSourceUrl(null);
     } else if (message.event === "error") {

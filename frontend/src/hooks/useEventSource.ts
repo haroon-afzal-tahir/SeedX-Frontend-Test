@@ -9,12 +9,10 @@ interface EventSourceMessage {
 
 function parseResponse(str: string): EventSourceMessage {
   try {
-    console.log("Parsing response:", str);
     const parsed = JSON.parse(str);
-    console.log("Parsed:", parsed);
     return { event: parsed.event, data: parsed.data };
   } catch (err) {
-    console.error("Error parsing response:", err);
+    console.error("Error parsing response:", err, str);
     return { event: "error", data: str };
   }
 }
