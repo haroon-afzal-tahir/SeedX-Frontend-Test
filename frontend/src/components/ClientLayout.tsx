@@ -39,6 +39,25 @@ export function ClientLayout() {
     }
   }, [windowWidth]); // Remove isSidebarOpen dependency
 
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Only handle clicks in mobile view
+      if (windowWidth < 768) {
+        const target = event.target as HTMLElement;
+        // Check if click is outside sidebar and sidebar is open
+        if (!target.closest('.bg-sidebar') && isSidebarOpen) {
+          setIsSidebarOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarOpen, windowWidth]);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };

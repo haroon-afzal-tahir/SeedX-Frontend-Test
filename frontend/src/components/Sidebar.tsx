@@ -18,7 +18,7 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
   const router = useRouter();
 
   const { isOpen, setIsOpen } = props;
-  
+
   // Track sidebar position
   const [margin, setMargin] = useState(0);
   const WIDTH = 250;
@@ -28,24 +28,24 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
     const target = isOpen ? 0 : -WIDTH;
     const speed = 0.15; // Animation speed factor
     let frameId: number;
-    
+
     function animatePosition() {
       // Move current position toward target with lerp
       const distance = target - margin;
       const movement = distance * speed;
-      
+
       // Stop animation when we're close enough
       if (Math.abs(distance) < 0.5) {
         setMargin(target);
         return;
       }
-      
+
       setMargin(margin + movement);
       frameId = requestAnimationFrame(animatePosition);
     }
-    
+
     frameId = requestAnimationFrame(animatePosition);
-    
+
     // Clean up animation when component unmounts or dependencies change
     return () => cancelAnimationFrame(frameId);
   }, [isOpen, margin]);
@@ -93,6 +93,7 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
       </button>
       <Link
         href="/"
+        onClick={() => setIsOpen(false)}
         className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}
       >
         <IoCarSportSharp fontSize={20} /> SuperCar Assistant
@@ -102,7 +103,7 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
           <hr className="my-2" />
           <div className="flex flex-col gap-2">
             {sessions.map((session) => (
-              <Link key={session.id} href={`/${session.id}`} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md w-full text-sm truncate ${id === session.id ? 'bg-background' : 'hover:bg-sidebar-hover'}`}>
+              <Link key={session.id} href={`/${session.id}`} onClick={() => setIsOpen(false)} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md w-full text-sm truncate ${id === session.id ? 'bg-background' : 'hover:bg-sidebar-hover'}`}>
                 <span className={`truncate group-hover:ml-4 transition-all ${id === session.id ? '!ml-6' : ''}`}>
                   {session.name}
                 </span>
