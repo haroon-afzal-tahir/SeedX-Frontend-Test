@@ -3,7 +3,7 @@
 import { Message } from "@/components/Message";
 import { useSessions } from "@/context/sessions.context";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { PiPaperPlaneRightFill } from "react-icons/pi";
 import { useEventSource } from "@/hooks/useEventSource"; // Import the custom hook
 
@@ -19,6 +19,7 @@ export default function Chat() {
   const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
   const processingRef = useRef(false); // Add this to prevent duplicate calls
   const [isInitialized, setIsInitialized] = useState(false);
+  const lastContentRef = useRef<string>("");
 
   const session = getSession(id as string);
 
@@ -41,26 +42,38 @@ export default function Chat() {
     });
   }
 
-  function updateAssistantContext(content: string, toolOutput?: ToolOutput) {
+  const updateAssistantContext = useCallback((content: string, toolOutput?: ToolOutput) => {
     if (content.length === 0 && !toolOutput) return;
-    setAssistantContext((prev) => {
-      const newContext = {
-        messageId: prev.messageId,
-        content: prev.content + content,
-        toolOutput: toolOutput ? [...prev.toolOutput, toolOutput] : prev.toolOutput,
-      };
 
+    setAssistantContext((prev) => {
+      // Skip if content hasn't changed
+      if (content === lastContentRef.current) {
+        return {
+          ...prev,
+          toolOutput: toolOutput ? [...prev.toolOutput, toolOutput] : prev.toolOutput,
+        };
+      }
+
+      lastContentRef.current = content;
+      const newToolOutput = toolOutput ? [...prev.toolOutput, toolOutput] : prev.toolOutput;
+
+      // Update message in session
       updateMessage(id as string, {
         id: prev.messageId,
         createdAt: new Date(),
         content: content,
         isUser: false,
-        toolOutput: newContext.toolOutput
+        toolOutput: newToolOutput
       });
 
-      return newContext;
+      // Return updated context
+      return {
+        messageId: prev.messageId,
+        content: prev.content + content,
+        toolOutput: newToolOutput
+      };
     });
-  }
+  }, [id, updateMessage]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
