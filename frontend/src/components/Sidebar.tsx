@@ -7,13 +7,48 @@ import { MdDelete } from "react-icons/md";
 import { useState, useEffect } from "react";
 import { IoCarSportSharp } from "react-icons/io5";
 import { useParams, useRouter } from "next/navigation";
+import { BiArrowBack } from "react-icons/bi";
 
-export const Sidebar = () => {
+export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) => {
+
   const { sessions, deleteSession } = useSessions();
   const [mounted, setMounted] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { id } = useParams();
   const router = useRouter();
+
+  const { isOpen, setIsOpen } = props;
+  
+  // Track sidebar position
+  const [margin, setMargin] = useState(0);
+  const WIDTH = 250;
+
+  // Animate sidebar movement
+  useEffect(() => {
+    const target = isOpen ? 0 : -WIDTH;
+    const speed = 0.15; // Animation speed factor
+    let frameId: number;
+    
+    function animatePosition() {
+      // Move current position toward target with lerp
+      const distance = target - margin;
+      const movement = distance * speed;
+      
+      // Stop animation when we're close enough
+      if (Math.abs(distance) < 0.5) {
+        setMargin(target);
+        return;
+      }
+      
+      setMargin(margin + movement);
+      frameId = requestAnimationFrame(animatePosition);
+    }
+    
+    frameId = requestAnimationFrame(animatePosition);
+    
+    // Clean up animation when component unmounts or dependencies change
+    return () => cancelAnimationFrame(frameId);
+  }, [isOpen, margin]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,7 +87,10 @@ export const Sidebar = () => {
   }, []);
 
   return (
-    <div className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2">
+    <div className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2 md:static fixed shadow-lg z-10" style={{ marginLeft: margin, width: WIDTH }}>
+      <button className="p-2 md:hidden rounded-md transition-all hover:bg-background self-start cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+        <BiArrowBack />
+      </button>
       <Link
         href="/"
         className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}

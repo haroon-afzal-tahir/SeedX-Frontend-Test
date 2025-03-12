@@ -142,8 +142,8 @@ export default function Chat() {
   });
 
   return (
-    <div className="flex flex-col gap-4 p-4 w-full h-full">
-      <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
+    <div className="flex flex-col gap-4 py-4 overflow-y-auto w-full">
+      <div className="flex flex-col gap-4 px-4 h-full overflow-y-auto overflow-x-hidden">
         {session?.messages.map((message) => (
           <Message
             key={message.id}
@@ -154,13 +154,16 @@ export default function Chat() {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg w-full relative p-4">
+      <div className="px-4">
+        
+      <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg relative p-4">
         <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
-
         <button type="submit" disabled={processingRef.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
           <PiPaperPlaneRightFill className="text-background" />
         </button>
-      </form>
+        </form>
+      </div>
+        
     </div>
   );
 }

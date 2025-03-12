@@ -5,6 +5,7 @@
 This repository contains a test for frontend engineers who will be working on AI-related systems. The test focuses on building a chat interface that interacts with an AI agent through a backend API. The AI agent, named Lex, is a virtual sales lead follow-up assistant for SuperCar car dealerships.
 
 The test evaluates your ability to:
+
 1. Consume a Server-Sent Events (SSE) API
 2. Handle different types of streaming events
 3. Create custom UI components for different tool outputs
@@ -70,9 +71,9 @@ The AI assistant can use the following tools:
 
 ### Running the Backend
 
-* First go to https://console.groq.com/playground and create an account.
-* Then go to https://console.groq.com/keys and create a new key.
-* Place the key in the ```backend/.env``` file. There is already a .env.example file that you can use as a template.
+- First go to https://console.groq.com/playground and create an account.
+- Then go to https://console.groq.com/keys and create a new key.
+- Place the key in the `backend/.env` file. There is already a .env.example file that you can use as a template.
 
 You have two options to run the backend:
 
@@ -80,8 +81,8 @@ You have two options to run the backend:
 
 ```bash
 cd backend
-docker build -t SuperCar-assistant-backend .
-docker run -p 8000:8000 SuperCar-assistant-backend
+docker build -t supercar-assistant-backend .
+docker run -p 8000:8000 supercar-assistant-backend
 ```
 
 #### Option 2: Using Docker Compose
@@ -133,4 +134,4 @@ Please submit your solution as a Git repository with:
 - Consider the user flow and how to make the conversation feel natural
 - Test your solution thoroughly with different conversation scenarios
 
-Good luck! 
+Good luck!
