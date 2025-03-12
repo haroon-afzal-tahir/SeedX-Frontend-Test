@@ -1,8 +1,18 @@
+interface ToolOutput {
+  type:
+    | "check_appointment_availability"
+    | "schedule_appointment"
+    | "get_dealership_address"
+    | "get_weather";
+  data: string;
+}
+
 interface Message {
   id: string;
   content: string;
   createdAt: Date;
   isUser: boolean;
+  toolOutput?: ToolOutput[];
 }
 
 interface Session {

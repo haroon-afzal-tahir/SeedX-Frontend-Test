@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
                     data: "",
                   };
                 } else if (line.startsWith("data: ") && currentEvent) {
+                  // For tool_output events, preserve the JSON structure
                   currentEvent.data = line.slice(6).replace("\r", "");
                 }
               }
@@ -71,6 +72,13 @@ export async function GET(req: NextRequest) {
 
               // Forward each event in the message
               for (const evt of events) {
+                // Skip empty chunk events
+                if (
+                  evt.event === "chunk" &&
+                  (!evt.data || evt.data.length === 0)
+                ) {
+                  continue;
+                }
                 controller.enqueue(`data: ${JSON.stringify(evt)}\n\n`);
               }
             }
