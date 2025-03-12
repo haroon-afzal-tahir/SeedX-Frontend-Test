@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 interface EventSourceMessage {
   event: string;
   data: string;
+  errorData?: Event;
 }
 
 function parseResponse(str: string): EventSourceMessage {
@@ -68,30 +69,24 @@ export function useEventSource(
         const parsed = parseResponse(event.data);
         onMessage(parsed);
       } catch (err) {
-        onMessage({ event: "error", data: "Failed to handle message" });
+        onMessage({
+          event: "error",
+          data: "Failed to handle message",
+          errorData: event,
+        });
         console.error("Failed to handle message:", err);
       }
     };
 
     eventSource.onerror = (event) => {
       console.error("EventSource error occurred:", event);
-      setIsConnected(false);
-      setError("Connection lost, attempting to reconnect...");
-      eventSource.close();
-      handleReconnect();
+      onMessage({
+        event: "error",
+        data: "Failed to handle message",
+        errorData: event,
+      });
+      // eventSource.close();
     };
-  };
-
-  const handleReconnect = () => {
-    if (reconnectAttemptsRef.current < maxReconnectAttempts) {
-      const retryTimeout = 1000 * Math.pow(2, reconnectAttemptsRef.current); // Exponential backoff
-      setTimeout(() => {
-        reconnectAttemptsRef.current += 1;
-        connect();
-      }, retryTimeout);
-    } else {
-      setError("Maximum reconnect attempts reached.");
-    }
   };
 
   useEffect(() => {

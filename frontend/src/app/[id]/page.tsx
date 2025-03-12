@@ -138,7 +138,7 @@ export default function Chat() {
     <div className="flex flex-col gap-4 p-4 w-full h-full">
       <div className="flex flex-col gap-4 h-full overflow-y-auto overflow-x-hidden">
         {session?.messages.map((message) => (
-          <Message key={message.id} message={message} />
+          <Message key={message.id} message={message} isComplete={processingRef.current} />
         ))}
       </div>
 
