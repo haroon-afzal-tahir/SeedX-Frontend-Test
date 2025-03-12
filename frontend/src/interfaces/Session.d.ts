@@ -14,6 +14,7 @@ interface Message {
   content: string;
   createdAt: Date;
   isUser: boolean;
+  triggered?: boolean;
   toolOutput?: ToolOutput[];
 }
 

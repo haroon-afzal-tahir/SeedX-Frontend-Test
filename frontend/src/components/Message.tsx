@@ -79,7 +79,10 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
           <div className="inline-block align-middle h-2.5 w-2.5 bg-gray-300 rounded-full ml-1 shrink-0" />
         )}
       </div>
-      {renderToolOutput()}
+      <div className='px-4'>
+
+        {renderToolOutput()}
+      </div>
     </div>
   )
 }

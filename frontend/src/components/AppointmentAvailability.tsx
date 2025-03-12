@@ -1,4 +1,11 @@
+"use client"
+
+import { useSessions } from "@/context/sessions.context";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+
 export const AppointmentAvailability = ({ output }: { output: string }) => {
+  const [isClicked, setIsClicked] = useState<boolean>(false)
   // Parse the string to get the array of times
   const parseTimeSlots = (outputString: string) => {
     try {
@@ -16,10 +23,27 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
   };
 
   const timeSlots = parseTimeSlots(output);
+  const { id } = useParams()
+
+  const { addMessage } = useSessions()
+
+  function handleClick(time: string) {
+    if (!isClicked) {
+      setIsClicked(true)
+      addMessage(id as string, {
+        id: crypto.randomUUID(),
+        content: `I would like to book an appointment for ${time}`,
+        createdAt: new Date(),
+        isUser: true,
+        triggered: true,
+        toolOutput: []
+      })
+    }
+  }
 
   return (
-    <div className="p-6 bg-sidebar rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200 border-b pb-3">
+    <div className="p-6 bg-sidebar rounded-lg shadow-md text-sm">
+      <h2 className="font-bold mb-6 text-gray-800 dark:text-gray-200 border-b pb-3">
         Available Appointment Times
       </h2>
       {timeSlots.length === 0 ? (
@@ -29,13 +53,15 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {timeSlots.map((time: string) => (
-            <div
+            <button
               key={time}
-              className="bg-white dark:bg-sidebar/90 border border-gray-200 dark:border-gray-700
-                text-gray-800 dark:text-gray-300 py-3 px-4 rounded-lg text-center"
+              onClick={() => handleClick(time)}
+              className="bg-gray-50 dark:bg-gray-800/50 text-gray-800 dark:text-gray-300 
+                py-2 px-3 rounded border-l-4 border-l-blue-500 border-t border-r border-b 
+                border-gray-200 dark:border-gray-700 text-center select-none cursor-pointer"
             >
               {time}
-            </div>
+            </button>
           ))}
         </div>
       )}

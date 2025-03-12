@@ -31,9 +31,11 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased h-full w-full`}
         >
-          <main className="flex md:flex-row flex-col h-[100dvh] w-full overflow-hidden">   
+          <main className="flex md:flex-row flex-col h-[100dvh] w-full overflow-hidden">
             <ClientLayout />
-            {children}
+            <div className="md:max-w-3xl mx-auto w-full h-full">
+              {children}
+            </div>
           </main>
         </body>
       </html>

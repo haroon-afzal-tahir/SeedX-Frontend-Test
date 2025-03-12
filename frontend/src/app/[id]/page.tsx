@@ -38,6 +38,7 @@ export default function Chat() {
       createdAt: new Date(),
       content: "",
       isUser: false,
+      triggered: false,
       toolOutput: [],
     });
   }
@@ -93,6 +94,7 @@ export default function Chat() {
       createdAt: new Date(),
       content: message,
       isUser: true,
+      triggered: false,
       toolOutput: [],
     });
 
@@ -122,6 +124,18 @@ export default function Chat() {
     }
   }, [isInitialized, session, id, addAssistantMessage]);
 
+  useEffect(() => {
+    // if the last message is triggered, add an assistant message
+    if (session?.messages[session.messages.length - 1].triggered) {
+      const urlParams = new URLSearchParams({
+        session_id: id as string,
+        query: session?.messages[session.messages.length - 1].content || "",
+      });
+      addAssistantMessage();
+      setEventSourceUrl(`api/query?${urlParams.toString()}`);
+    }
+  }, [session]);
+
   // Using the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
     if (message.event === "chunk") {
@@ -142,7 +156,7 @@ export default function Chat() {
   });
 
   return (
-    <div className="flex flex-col gap-4 py-4 overflow-y-auto w-full">
+    <div className="flex flex-col gap-4 py-4 overflow-y-auto w-full justify-between h-full">
       <div className="flex flex-col gap-4 px-4 h-full overflow-y-auto overflow-x-hidden">
         {session?.messages.map((message) => (
           <Message
@@ -154,16 +168,15 @@ export default function Chat() {
         ))}
       </div>
 
-      <div className="px-4">
-        
-      <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg relative p-4">
-        <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
-        <button type="submit" disabled={processingRef.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
-          <PiPaperPlaneRightFill className="text-background" />
-        </button>
+      <div className="px-4 md:h-fit h-[100px]">
+        <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg relative p-4">
+          <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
+          <button type="submit" disabled={processingRef.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
+            <PiPaperPlaneRightFill className="text-background" />
+          </button>
         </form>
       </div>
-        
+
     </div>
   );
 }
