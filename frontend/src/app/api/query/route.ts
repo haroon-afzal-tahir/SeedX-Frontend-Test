@@ -35,22 +35,50 @@ export async function GET(req: NextRequest) {
         }
 
         // Read the response body
+        let errorCount = 0;
         while (true) {
           try {
             const { done, value } = await reader.read();
             if (done) break;
+
+            // Decode the chunk and split into individual SSE messages
             const text = new TextDecoder().decode(value);
-            controller.enqueue(`data: ${text}\n\n`);
+            const messages = text.split("\n\n").filter((msg) => msg.trim());
+
+            // Process each SSE message
+            for (const message of messages) {
+              const lines = message.split("\n");
+              const parsedMessage: Record<string, string> = {};
+
+              for (const line of lines) {
+                if (line.startsWith("event: ") || line.startsWith("data: ")) {
+                  const [field, ...values] = line.split(": ");
+                  const fieldValue = values.join(": ");
+                  if (field === "event")
+                    parsedMessage[field] = fieldValue.trim();
+                  if (field === "data") {
+                    parsedMessage[field] = fieldValue.replaceAll("\r", "");
+                  }
+                }
+              }
+
+              console.log("Parsed message:", parsedMessage);
+
+              // Forward the parsed SSE message
+              controller.enqueue(`data: ${JSON.stringify(parsedMessage)}\n\n`);
+            }
           } catch (readError) {
             console.error("Error reading stream:", readError);
+            if (errorCount > 10) break;
+            errorCount++;
           }
         }
 
+        controller.close();
         reader.releaseLock();
       } catch (error) {
         console.error("Error in stream:", error);
         controller.error(error);
-      } finally {
         controller.close();
       }
     },

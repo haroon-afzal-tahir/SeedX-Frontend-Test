@@ -9,20 +9,12 @@ interface EventSourceMessage {
 
 function parseResponse(str: string): EventSourceMessage {
   try {
-    const lines = str.split("\n");
-    let event = "";
-    const data = lines.map((line) => {
-      const [key, value] = line.split(": ");
-      if (key === "event" && value.trim() === "chunk") {
-        event = "chunk";
-        return lines.slice(lines.indexOf(line) + 1).join("");
-      } else if (key === "event") {
-        event = value.trim();
-      }
-    });
-    return { event, data: data.join("") };
+    console.log("Parsing response:", str);
+    const parsed = JSON.parse(str);
+    console.log("Parsed:", parsed);
+    return { event: parsed.event, data: parsed.data };
   } catch (err) {
-    console.error("Failed to parse response:", err);
+    console.error("Error parsing response:", err);
     return { event: "error", data: str };
   }
 }
@@ -74,12 +66,10 @@ export function useEventSource(
           data: "Failed to handle message",
           errorData: event,
         });
-        console.error("Failed to handle message:", err);
       }
     };
 
     eventSource.onerror = (event) => {
-      console.error("EventSource error occurred:", event);
       onMessage({
         event: "error",
         data: "Failed to handle message",
