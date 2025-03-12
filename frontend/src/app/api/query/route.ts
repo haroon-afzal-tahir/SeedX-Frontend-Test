@@ -48,24 +48,31 @@ export async function GET(req: NextRequest) {
             // Process each SSE message
             for (const message of messages) {
               const lines = message.split("\n");
-              const parsedMessage: Record<string, string> = {};
+              const events = [];
+              let currentEvent = null;
 
               for (const line of lines) {
-                if (line.startsWith("event: ") || line.startsWith("data: ")) {
-                  const [field, ...values] = line.split(": ");
-                  const fieldValue = values.join(": ");
-                  if (field === "event")
-                    parsedMessage[field] = fieldValue.trim();
-                  if (field === "data") {
-                    parsedMessage[field] = fieldValue.replaceAll("\r", "");
+                if (line.startsWith("event: ")) {
+                  if (currentEvent) {
+                    events.push(currentEvent);
                   }
+                  currentEvent = {
+                    event: line.slice(7).trim().replace("\r", ""),
+                    data: "",
+                  };
+                } else if (line.startsWith("data: ") && currentEvent) {
+                  currentEvent.data = line.slice(6).replace("\r", "");
                 }
               }
 
-              console.log("Parsed message:", parsedMessage);
+              if (currentEvent) {
+                events.push(currentEvent);
+              }
 
-              // Forward the parsed SSE message
-              controller.enqueue(`data: ${JSON.stringify(parsedMessage)}\n\n`);
+              // Forward each event in the message
+              for (const evt of events) {
+                controller.enqueue(`data: ${JSON.stringify(evt)}\n\n`);
+              }
             }
           } catch (readError) {
             console.error("Error reading stream:", readError);
