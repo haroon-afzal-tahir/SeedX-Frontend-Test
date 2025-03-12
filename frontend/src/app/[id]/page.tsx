@@ -136,6 +136,7 @@ export default function Chat() {
             key={message.id}
             message={message}
             isComplete={!processingRef.current}
+            assistantMessageId={assistantContext.messageId}
           />
         ))}
       </div>
