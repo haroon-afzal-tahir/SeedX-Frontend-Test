@@ -9,7 +9,7 @@ import { useEventSource } from "@/hooks/useEventSource"; // Import the custom ho
 
 export default function Chat() {
   const { id } = useParams();
-  const { getSession, addMessage, updateMessage } = useSessions();
+  const { getSession, addMessage, updateMessage, deleteMessage } = useSessions();
   const router = useRouter();
   const [assistantContext, setAssistantContext] = useState({
     messageId: "",
@@ -127,12 +127,18 @@ export default function Chat() {
   useEffect(() => {
     // if the last message is triggered, add an assistant message
     if (session?.messages[session.messages.length - 1].triggered) {
-      const urlParams = new URLSearchParams({
-        session_id: id as string,
-        query: session?.messages[session.messages.length - 1].content || "",
-      });
-      addAssistantMessage();
-      setEventSourceUrl(`api/query?${urlParams.toString()}`);
+      // Check if there exists a message with triggered true except the last one
+      const triggeredMessages = session.messages.filter((message) => message.triggered && message.id !== session.messages[session.messages.length - 1].id);
+      if (triggeredMessages.length === 0) {
+        const urlParams = new URLSearchParams({
+          session_id: id as string,
+          query: session?.messages[session.messages.length - 1].content || "",
+        });
+        addAssistantMessage();
+        setEventSourceUrl(`api/query?${urlParams.toString()}`);
+      } else {
+        deleteMessage(id as string, triggeredMessages[0].id);
+      }
     }
   }, [session]);
 
@@ -170,7 +176,7 @@ export default function Chat() {
 
       <div className="px-4 md:h-fit h-[100px]">
         <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg relative p-4">
-          <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
+          <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12 text-sm" autoFocus />
           <button type="submit" disabled={processingRef.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
             <PiPaperPlaneRightFill className="text-background" />
           </button>

@@ -41,7 +41,7 @@ export default function Home() {
       <h1 className="text-3xl font-semibold">What would you like to do?</h1>
 
       <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg w-full relative p-4">
-        <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
+        <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12 text-sm" autoFocus />
 
         <button type="submit" className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
           <PiPaperPlaneRightFill className="text-background" />

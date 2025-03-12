@@ -86,6 +86,13 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
     setMounted(true);
   }, []);
 
+  const handleLinkClick = () => {
+    // Only close sidebar on mobile devices
+    if (window.innerWidth < 768) { // 768px is the standard md breakpoint
+      setIsOpen(false);
+    }
+  };
+
   return (
     <div className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2 md:static fixed shadow-lg z-10" style={{ marginLeft: margin, width: WIDTH }}>
       <button className="p-2 md:hidden rounded-md transition-all hover:bg-background self-start cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
@@ -93,7 +100,7 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
       </button>
       <Link
         href="/"
-        onClick={() => setIsOpen(false)}
+        onClick={handleLinkClick}
         className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''} flex justify-center items-center gap-2 w-full text-sm text-center`}
       >
         <IoCarSportSharp fontSize={20} /> SuperCar Assistant
@@ -103,7 +110,7 @@ export const Sidebar = (props: { isOpen: boolean; setIsOpen: (isOpen: boolean) =
           <hr className="my-2" />
           <div className="flex flex-col gap-2">
             {sessions.map((session) => (
-              <Link key={session.id} href={`/${session.id}`} onClick={() => setIsOpen(false)} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md w-full text-sm truncate ${id === session.id ? 'bg-background' : 'hover:bg-sidebar-hover'}`}>
+              <Link key={session.id} href={`/${session.id}`} onClick={handleLinkClick} className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md w-full text-sm truncate ${id === session.id ? 'bg-background' : 'hover:bg-sidebar-hover'}`}>
                 <span className={`truncate group-hover:ml-4 transition-all ${id === session.id ? '!ml-6' : ''}`}>
                   {session.name}
                 </span>
