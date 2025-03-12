@@ -109,23 +109,12 @@ export default function Chat() {
   useEventSource(eventSourceUrl, (message) => {
     if (message.event === "chunk") {
       updateAssistantContext(message.data);
-    } else if (message.event === "tool_use") {
-      console.log({
-        type: message.data as ToolOutputType,
-        data: ""
-      })
-      updateAssistantContext(message.data, {
-        type: message.data as ToolOutputType,
-        data: ""
-      });
     } else if (message.event === "tool_output") {
-      console.log({
-        type: assistantContext.toolOutput?.type as ToolOutputType,
-        data: message.data as string
-      })
-      updateAssistantContext(message.data, {
-        type: assistantContext.toolOutput?.type as ToolOutputType,
-        data: message.data as string
+      const { name, output } = JSON.parse(message.data);
+      console.log({ name, output })
+      updateAssistantContext("", {
+        type: name as ToolOutputType,
+        data: output as string
       });
     } else if (message.event === "end") {
       processingRef.current = false;
