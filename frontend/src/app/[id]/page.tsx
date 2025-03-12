@@ -18,11 +18,13 @@ export default function Chat() {
   const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
   const processingRef = useRef(false); // Add this to prevent duplicate calls
   const initialApiCallMadeRef = useRef(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const session = getSession(id as string);
 
   useEffect(() => {
     if (!session || session.messages.length === 0) {
+      setEventSourceUrl(null); // Clear the EventSource URL before navigation
       router.push("/");
     }
   }, [session, router]);
@@ -101,14 +103,13 @@ export default function Chat() {
 
   useEffect(() => {
     if (
-      session &&
-      session.messages.length === 1 &&
-      !processingRef.current &&
-      !initialApiCallMadeRef.current
+      !isInitialized &&
+      session?.messages.length === 1 &&
+      !processingRef.current
     ) {
-      initialApiCallMadeRef.current = true;
+      setIsInitialized(true);
       processingRef.current = true;
-      console.log("Initial API call to fetch the system response");
+      console.log(session.messages);
       const urlParams = new URLSearchParams({
         session_id: id as string,
         query: session.messages[0].content,
@@ -116,16 +117,20 @@ export default function Chat() {
       addAssistantMessage();
       setEventSourceUrl(`api/query?${urlParams.toString()}`);
     }
-  }, [id, session]);
+  }, [isInitialized, session, id, addAssistantMessage]);
 
   // Use the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
+    // Only process messages if we're still on this route
     if (message.event === "chunk") {
       updateAssistantContext(message.data);
     } else if (message.event === "end") {
       // Reset processing state when the response is complete
       processingRef.current = false;
       setEventSourceUrl(null);
+    } else if (message.event === "error") {
+      setEventSourceUrl(null);
+      processingRef.current = false;
     }
   });
 
@@ -140,7 +145,7 @@ export default function Chat() {
       <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg w-full relative p-4">
         <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12" autoFocus />
 
-        <button type="submit" className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
+        <button type="submit" disabled={processingRef.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
           <PiPaperPlaneRightFill className="text-background" />
         </button>
       </form>

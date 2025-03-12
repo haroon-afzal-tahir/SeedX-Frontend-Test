@@ -44,7 +44,13 @@ export function useEventSource(
       eventSourceRef.current = null;
     }
 
-    if (!url || url === urlRef.current) return;
+    if (!url) {
+      urlRef.current = null;
+      setIsConnected(false);
+      return;
+    }
+
+    if (url === urlRef.current) return;
     urlRef.current = url;
 
     const eventSource = new EventSource(url);
@@ -62,6 +68,7 @@ export function useEventSource(
         const parsed = parseResponse(event.data);
         onMessage(parsed);
       } catch (err) {
+        onMessage({ event: "error", data: "Failed to handle message" });
         console.error("Failed to handle message:", err);
       }
     };
@@ -90,11 +97,14 @@ export function useEventSource(
   useEffect(() => {
     connect();
 
+    // Cleanup function
     return () => {
       if (eventSourceRef.current) {
+        console.log("Closing EventSource connection");
         eventSourceRef.current.close();
         eventSourceRef.current = null;
         urlRef.current = null;
+        setIsConnected(false);
       }
     };
   }, [url]);
