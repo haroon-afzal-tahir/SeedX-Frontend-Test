@@ -42,7 +42,8 @@ export const SessionsProvider: React.FC<{ children: ReactNode }> = ({ children }
           if (messageIndex !== -1) {
             updatedMessages[messageIndex] = {
               ...updatedMessages[messageIndex],
-              content: updatedMessages[messageIndex].content + message.content
+              content: updatedMessages[messageIndex].content + message.content,
+              toolOutput: message.toolOutput
             };
           }
           return { ...s, messages: updatedMessages };
@@ -58,7 +59,8 @@ export const SessionsProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (messageIndex !== -1) {
         updatedSessions[sessionIndex].messages[messageIndex] = {
           ...updatedSessions[sessionIndex].messages[messageIndex],
-          content: updatedSessions[sessionIndex].messages[messageIndex].content + message.content
+          content: updatedSessions[sessionIndex].messages[messageIndex].content + message.content,
+          toolOutput: message.toolOutput
         };
         localStorage.setItem('sessions', JSON.stringify(updatedSessions));
       }

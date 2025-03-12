@@ -24,8 +24,6 @@ export function useEventSource(
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectAttemptsRef = useRef(0);
-  const maxReconnectAttempts = 5;
   const urlRef = useRef<string | null>(null);
 
   const connect = () => {
@@ -50,7 +48,6 @@ export function useEventSource(
     eventSource.onopen = () => {
       setIsConnected(true);
       setError(null);
-      reconnectAttemptsRef.current = 0;
     };
 
     eventSource.onmessage = (event) => {

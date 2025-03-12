@@ -1,9 +1,11 @@
+type ToolOutputType =
+  | "check_appointment_availability"
+  | "schedule_appointment"
+  | "get_dealership_address"
+  | "get_weather";
+
 interface ToolOutput {
-  type:
-    | "check_appointment_availability"
-    | "schedule_appointment"
-    | "get_dealership_address"
-    | "get_weather";
+  type: ToolOutputType;
   data: string;
 }
 
@@ -12,7 +14,7 @@ interface Message {
   content: string;
   createdAt: Date;
   isUser: boolean;
-  toolOutput?: ToolOutput[];
+  toolOutput?: ToolOutput;
 }
 
 interface Session {

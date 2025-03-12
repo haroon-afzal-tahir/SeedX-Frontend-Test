@@ -14,10 +14,10 @@ export default function Chat() {
   const [assistantContext, setAssistantContext] = useState({
     messageId: "",
     content: "",
+    toolOutput: undefined as ToolOutput | undefined,
   });
   const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
   const processingRef = useRef(false); // Add this to prevent duplicate calls
-  const initialApiCallMadeRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   const session = getSession(id as string);
@@ -31,7 +31,7 @@ export default function Chat() {
 
   function addAssistantMessage() {
     const assistantMessageId = crypto.randomUUID();
-    setAssistantContext({ messageId: assistantMessageId, content: "" });
+    setAssistantContext({ messageId: assistantMessageId, content: "", toolOutput: undefined });
     addMessage(id as string, {
       id: assistantMessageId,
       createdAt: new Date(),
@@ -40,20 +40,21 @@ export default function Chat() {
     });
   }
 
-  function updateAssistantContext(content: string) {
+  function updateAssistantContext(content: string, toolOutput?: ToolOutput) {
     if (content.length === 0) return;
 
-    // Only update the local state with the new chunk
     setAssistantContext((prev) => ({
       messageId: prev.messageId,
-      content: prev.content + content
+      content: prev.content + content,
+      toolOutput: toolOutput
     }));
-    // Pass only the new chunk to updateMessage
+
     updateMessage(id as string, {
       id: assistantContext.messageId,
       createdAt: new Date(),
-      content: content, // Just pass the new chunk
+      content: content,
       isUser: false,
+      toolOutput: toolOutput
     });
   }
 
@@ -78,14 +79,7 @@ export default function Chat() {
     });
 
     // assistant message
-    let assistantMessageId = crypto.randomUUID();
-    setAssistantContext({ messageId: assistantMessageId, content: "" });
-    addMessage(id as string, {
-      id: assistantMessageId,
-      createdAt: new Date(),
-      content: "",
-      isUser: false,
-    });
+    addAssistantMessage();
 
     const urlParams = new URLSearchParams({
       session_id: id as string,
@@ -111,20 +105,34 @@ export default function Chat() {
     }
   }, [isInitialized, session, id, addAssistantMessage]);
 
-  // Use the custom hook to handle EventSource
+  // Using the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
-    // Only process messages if we're still on this route
     if (message.event === "chunk") {
       updateAssistantContext(message.data);
+    } else if (message.event === "tool_use") {
+      console.log({
+        type: message.data as ToolOutputType,
+        data: ""
+      })
+      updateAssistantContext(message.data, {
+        type: message.data as ToolOutputType,
+        data: ""
+      });
+    } else if (message.event === "tool_output") {
+      console.log({
+        type: assistantContext.toolOutput?.type as ToolOutputType,
+        data: message.data as string
+      })
+      updateAssistantContext(message.data, {
+        type: assistantContext.toolOutput?.type as ToolOutputType,
+        data: message.data as string
+      });
     } else if (message.event === "end") {
-      // Reset processing state when the response is complete
-      console.log("End:", message);
       processingRef.current = false;
       setEventSourceUrl(null);
     } else if (message.event === "error") {
-      console.log("Error:", message.errorData);
-      // setEventSourceUrl(null);
-      // processingRef.current = false;
+      setEventSourceUrl(null);
+      processingRef.current = false;
     }
   });
 
