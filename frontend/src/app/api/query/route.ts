@@ -48,7 +48,6 @@ export async function GET(req: NextRequest) {
             // Process each SSE message
             for (const message of messages) {
               const lines = message.split("\n");
-              console.log("Lines:", lines);
               const events = [];
               let currentEvent = null;
 
