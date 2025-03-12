@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export const AppointmentAvailability = ({ output }: { output: string }) => {
-  const [isClicked, setIsClicked] = useState<boolean>(false)
   // Parse the string to get the array of times
   const parseTimeSlots = (outputString: string) => {
     try {
@@ -25,19 +24,30 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
   const timeSlots = parseTimeSlots(output);
   const { id } = useParams()
 
-  const { addMessage } = useSessions()
+  const { addMessage, sessions } = useSessions()
 
   function handleClick(time: string) {
-    if (!isClicked) {
-      setIsClicked(true)
-      addMessage(id as string, {
-        id: crypto.randomUUID(),
-        content: `I would like to book an appointment for ${time}`,
-        createdAt: new Date(),
-        isUser: true,
-        triggered: true,
-        toolOutput: []
+    const session = sessions.find((s) => s.id === id)
+    if (session) {
+      // check if there's any message with toolOutput
+      const message = session.messages.find((m) => {
+        if (m.toolOutput) {
+          return m.toolOutput.some((tool) => tool.type === "schedule_appointment")
+        }
       })
+
+      console.log(message)
+
+      if (!message) {
+        addMessage(id as string, {
+          id: crypto.randomUUID(),
+          content: `I would like to book an appointment for ${time}`,
+          createdAt: new Date(),
+          isUser: true,
+          triggered: true,
+          toolOutput: []
+        })
+      }
     }
   }
 
