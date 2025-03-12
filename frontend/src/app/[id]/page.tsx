@@ -42,39 +42,23 @@ export default function Chat() {
   }
 
   function updateAssistantContext(content: string, toolOutput?: ToolOutput) {
-    if (content.length === 0) return;
-
+    if (content.length === 0 && !toolOutput) return;
     setAssistantContext((prev) => {
-      if (toolOutput) {
-        console.log({
-          messageId: prev.messageId,
-          content: prev.content + content,
-          toolOutput: toolOutput
-        })
-      }
-      return {
+      const newContext = {
         messageId: prev.messageId,
         content: prev.content + content,
-        toolOutput: [...prev.toolOutput, toolOutput || {} as ToolOutput]
-      }
-    });
+        toolOutput: toolOutput ? [...prev.toolOutput, toolOutput] : prev.toolOutput,
+      };
 
-    if (toolOutput) {
-      console.log({
-        id: assistantContext.messageId,
+      updateMessage(id as string, {
+        id: prev.messageId,
         createdAt: new Date(),
         content: content,
         isUser: false,
-        toolOutput: [...assistantContext.toolOutput, toolOutput || {} as ToolOutput]
-      })
-    }
+        toolOutput: newContext.toolOutput
+      });
 
-    updateMessage(id as string, {
-      id: assistantContext.messageId,
-      createdAt: new Date(),
-      content: content,
-      isUser: false,
-      toolOutput: [...assistantContext.toolOutput, ...[toolOutput || {} as ToolOutput]]
+      return newContext;
     });
   }
 
@@ -99,7 +83,6 @@ export default function Chat() {
       toolOutput: [],
     });
 
-    // assistant message
     addAssistantMessage();
 
     const urlParams = new URLSearchParams({
@@ -132,7 +115,6 @@ export default function Chat() {
       updateAssistantContext(message.data);
     } else if (message.event === "tool_output") {
       const { name, output } = JSON.parse(message.data);
-      console.log({ name, output })
       updateAssistantContext("", {
         type: name as ToolOutputType,
         data: output as string

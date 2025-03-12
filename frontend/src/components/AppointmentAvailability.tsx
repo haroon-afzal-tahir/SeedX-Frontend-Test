@@ -1,9 +1,13 @@
-export const AppointmentAvailability = ({ output }: { output: string[] }) => {
+export const AppointmentAvailability = ({ output }: { output: string }) => {
   // Parse the string to get the array of times
   const parseTimeSlots = (outputString: string) => {
     try {
-      // Remove the markdown code block syntax and parse the array
-      const cleanString = outputString.replace(/```/g, '');
+      // Remove escape characters, extra quotes, markdown code block syntax, and convert single quotes to double quotes
+      const cleanString = outputString
+        .replace(/\\"/g, '"')     // Remove escaped quotes
+        .replace(/^"|"$/g, '')    // Remove surrounding quotes
+        .replace(/```/g, '')      // Remove markdown code block syntax
+        .replace(/'/g, '"');      // Convert single quotes to double quotes
       return JSON.parse(cleanString);
     } catch (error) {
       console.error('Error parsing time slots:', error);
@@ -11,7 +15,7 @@ export const AppointmentAvailability = ({ output }: { output: string[] }) => {
     }
   };
 
-  const timeSlots = parseTimeSlots(output[0]);
+  const timeSlots = parseTimeSlots(output);
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">

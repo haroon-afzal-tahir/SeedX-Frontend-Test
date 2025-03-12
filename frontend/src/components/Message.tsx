@@ -50,7 +50,6 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
   };
 
   const renderToolOutput = () => {
-    console.log(message.toolOutput)
     if (!message.toolOutput || message.toolOutput.length === 0) {
       return null;
     }
@@ -62,8 +61,7 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
       }
 
       try {
-        const parsedData = JSON.parse(toolOutput.data);
-        return <Component output={parsedData?.output} />;
+        return <Component key={toolOutput.type} output={toolOutput.data} />;
       } catch (e) {
         console.error('Error parsing tool output:', e);
         return null;

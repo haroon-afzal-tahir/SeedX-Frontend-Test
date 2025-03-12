@@ -3,9 +3,21 @@ interface AppointmentConfirmationProps {
 }
 
 export const AppointmentConfirmation = ({ output }: AppointmentConfirmationProps) => {
-  // Parse the output string by removing the code block markers and parsing the JSON
-  const cleanOutput = output.replace(/^"```|```"$/g, '');
-  const appointmentData = JSON.parse(cleanOutput);
+  // Parse the output string by removing the code block markers and converting to valid JSON
+  const parseAppointmentData = (outputString: string) => {
+    try {
+      const cleanString = outputString
+        .replace(/^"|"$/g, '')    // Remove surrounding quotes
+        .replace(/```/g, '')      // Remove markdown code block syntax
+        .replace(/'/g, '"');      // Convert single quotes to double quotes
+      return JSON.parse(cleanString);
+    } catch (error) {
+      console.error('Error parsing appointment data:', error);
+      return {};
+    }
+  };
+
+  const appointmentData = parseAppointmentData(output);
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg border border-gray-100">
