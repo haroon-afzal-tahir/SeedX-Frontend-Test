@@ -16,6 +16,8 @@ export default function Chat() {
     content: "",
   });
   const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
+  const processingRef = useRef(false); // Add this to prevent duplicate calls
+  const initialApiCallMadeRef = useRef(false);
 
   const session = getSession(id as string);
 
@@ -37,20 +39,40 @@ export default function Chat() {
   }
 
   function updateAssistantContext(content: string) {
-    setAssistantContext({ messageId: assistantContext.messageId, content });
+    if (content.length === 0) return;
+
+    // Only update the local state with the new chunk
+    setAssistantContext((prev) => {
+      console.log("Updating assistant context:", {
+        messageId: prev.messageId,
+        content: prev.content + content
+      });
+      return {
+        messageId: prev.messageId,
+        content: prev.content + content
+      }
+    });
+
+    // Pass only the new chunk to updateMessage
     updateMessage(id as string, {
       id: assistantContext.messageId,
       createdAt: new Date(),
-      content: `${assistantContext.content}${content}`,
+      content: content, // Just pass the new chunk
       isUser: false,
     });
   }
 
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (processingRef.current) return;
+
+    setEventSourceUrl(null);
+
+    processingRef.current = true;
+
     const formData = new FormData(e.target as HTMLFormElement);
     const message = formData.get("message") as string;
+    (e.target as HTMLFormElement).reset(); // Clear the form
 
     // user message
     addMessage(id as string, {
@@ -60,12 +82,9 @@ export default function Chat() {
       isUser: true,
     });
 
-
     // assistant message
     let assistantMessageId = crypto.randomUUID();
-
     setAssistantContext({ messageId: assistantMessageId, content: "" });
-
     addMessage(id as string, {
       id: assistantMessageId,
       createdAt: new Date(),
@@ -77,33 +96,36 @@ export default function Chat() {
       session_id: id as string,
       query: message,
     });
-    const apiUrl = `api/query?${urlParams.toString()}`;
-
-    // Set the URL for EventSource
-    setEventSourceUrl(apiUrl);
+    setEventSourceUrl(`api/query?${urlParams.toString()}`);
   }
 
   useEffect(() => {
-    // Initial API call to fetch the system response if there's only one message
-    if (session && session.messages.length === 1) {
+    if (
+      session &&
+      session.messages.length === 1 &&
+      !processingRef.current &&
+      !initialApiCallMadeRef.current
+    ) {
+      initialApiCallMadeRef.current = true;
+      processingRef.current = true;
+      console.log("Initial API call to fetch the system response");
       const urlParams = new URLSearchParams({
         session_id: id as string,
         query: session.messages[0].content,
       });
-      const apiUrl = `api/query?${urlParams.toString()}`;
       addAssistantMessage();
-      setEventSourceUrl(apiUrl);
+      setEventSourceUrl(`api/query?${urlParams.toString()}`);
     }
   }, [id, session]);
 
   // Use the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
     if (message.event === "chunk") {
-      console.log({
-        messageId: assistantContext.messageId,
-        content: `${assistantContext.content}${message.data}`,
-      });
       updateAssistantContext(message.data);
+    } else if (message.event === "end") {
+      // Reset processing state when the response is complete
+      processingRef.current = false;
+      setEventSourceUrl(null);
     }
   });
 

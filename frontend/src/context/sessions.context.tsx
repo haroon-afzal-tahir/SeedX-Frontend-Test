@@ -34,8 +34,35 @@ export const SessionsProvider: React.FC<{ children: ReactNode }> = ({ children }
   }
 
   function updateMessage(id: string, message: Message) {
-    setSessions((prevSessions) => prevSessions.map((s) => s.id === id ? { ...s, messages: [...s.messages, message] } : s));
-    localStorage.setItem('sessions', JSON.stringify(sessions.map((s) => s.id === id ? { ...s, messages: [...s.messages, message] } : s)));
+    setSessions((prevSessions) => {
+      return prevSessions.map((s) => {
+        if (s.id === id) {
+          const updatedMessages = [...s.messages];
+          const messageIndex = updatedMessages.findIndex((m) => m.id === message.id);
+          if (messageIndex !== -1) {
+            updatedMessages[messageIndex] = {
+              ...updatedMessages[messageIndex],
+              content: updatedMessages[messageIndex].content + message.content
+            };
+          }
+          return { ...s, messages: updatedMessages };
+        }
+        return s;
+      });
+    });
+
+    const updatedSessions = JSON.parse(localStorage.getItem('sessions') || '[]');
+    const sessionIndex = updatedSessions.findIndex((s: Session) => s.id === id);
+    if (sessionIndex !== -1) {
+      const messageIndex = updatedSessions[sessionIndex].messages.findIndex((m: Message) => m.id === message.id);
+      if (messageIndex !== -1) {
+        updatedSessions[sessionIndex].messages[messageIndex] = {
+          ...updatedSessions[sessionIndex].messages[messageIndex],
+          content: updatedSessions[sessionIndex].messages[messageIndex].content + message.content
+        };
+        localStorage.setItem('sessions', JSON.stringify(updatedSessions));
+      }
+    }
   }
 
   function getSession(id: string) {

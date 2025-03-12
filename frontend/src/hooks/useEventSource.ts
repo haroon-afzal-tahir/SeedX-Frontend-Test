@@ -35,10 +35,17 @@ export function useEventSource(
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 5;
+  const urlRef = useRef<string | null>(null);
 
   const connect = () => {
-    if (!url) return;
-    if (eventSourceRef.current) eventSourceRef.current.close();
+    // Close any existing connection first
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+
+    if (!url || url === urlRef.current) return;
+    urlRef.current = url;
 
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
@@ -84,7 +91,11 @@ export function useEventSource(
     connect();
 
     return () => {
-      eventSourceRef.current?.close(); // Clean up connection on unmount
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+        urlRef.current = null;
+      }
     };
   }, [url]);
 
