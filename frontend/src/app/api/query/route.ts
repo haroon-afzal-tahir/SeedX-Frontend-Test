@@ -24,16 +24,12 @@ export async function GET(req: NextRequest) {
         );
 
         if (!response.ok) {
-          const errorBody = await response.text();
-          console.error("API error message:", errorBody);
-          controller.enqueue("Something went wrong...");
           controller.close();
           return;
         }
 
         const reader = response.body?.getReader();
         if (!reader) {
-          controller.enqueue("Something went wrong...");
           controller.close();
           return;
         }
@@ -47,13 +43,12 @@ export async function GET(req: NextRequest) {
             controller.enqueue(`data: ${text}\n\n`);
           } catch (readError) {
             console.error("Error reading stream:", readError);
-            controller.error(readError);
-            break;
           }
         }
 
         reader.releaseLock();
       } catch (error) {
+        console.error("Error in stream:", error);
         controller.error(error);
       } finally {
         controller.close();

@@ -44,17 +44,10 @@ export default function Chat() {
     if (content.length === 0) return;
 
     // Only update the local state with the new chunk
-    setAssistantContext((prev) => {
-      console.log("Updating assistant context:", {
-        messageId: prev.messageId,
-        content: prev.content + content
-      });
-      return {
-        messageId: prev.messageId,
-        content: prev.content + content
-      }
-    });
-
+    setAssistantContext((prev) => ({
+      messageId: prev.messageId,
+      content: prev.content + content
+    }));
     // Pass only the new chunk to updateMessage
     updateMessage(id as string, {
       id: assistantContext.messageId,
@@ -109,7 +102,6 @@ export default function Chat() {
     ) {
       setIsInitialized(true);
       processingRef.current = true;
-      console.log(session.messages);
       const urlParams = new URLSearchParams({
         session_id: id as string,
         query: session.messages[0].content,
@@ -122,15 +114,17 @@ export default function Chat() {
   // Use the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
     // Only process messages if we're still on this route
-    if (message.event === "chunk") {
+    if (message.event === "chunk" || message.event === "message") {
+      console.log("Message:", message);
       updateAssistantContext(message.data);
     } else if (message.event === "end") {
       // Reset processing state when the response is complete
       processingRef.current = false;
       setEventSourceUrl(null);
     } else if (message.event === "error") {
-      setEventSourceUrl(null);
-      processingRef.current = false;
+      console.log("Error:", message.errorData);
+      // setEventSourceUrl(null);
+      // processingRef.current = false;
     }
   });
 
