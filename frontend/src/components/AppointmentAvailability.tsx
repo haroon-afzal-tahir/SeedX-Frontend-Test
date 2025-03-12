@@ -42,8 +42,8 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
   }
 
   return (
-    <div className="p-6 bg-sidebar rounded-lg shadow-md text-sm">
-      <h2 className="font-bold mb-6 text-gray-800 dark:text-gray-200 border-b pb-3">
+    <div className="p-6 bg-background border border-border rounded-lg text-sm">
+      <h2 className="font-bold mb-6 text-foreground border-b pb-3">
         Available Appointment Times
       </h2>
       {timeSlots.length === 0 ? (
@@ -56,9 +56,9 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
             <button
               key={time}
               onClick={() => handleClick(time)}
-              className="bg-gray-50 dark:bg-gray-800/50 text-gray-800 dark:text-gray-300 
-                py-2 px-3 rounded border-l-4 border-l-blue-500 border-t border-r border-b 
-                border-gray-200 dark:border-gray-700 text-center select-none cursor-pointer"
+              className="bg-appointment-time-bg text-appointment-time-text 
+                py-2 px-3 rounded border-l-4 border-l-appointment-time-border border-t border-r border-b 
+                border-border text-center select-none cursor-pointer"
             >
               {time}
             </button>
