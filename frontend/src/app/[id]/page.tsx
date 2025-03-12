@@ -14,7 +14,7 @@ export default function Chat() {
   const [assistantContext, setAssistantContext] = useState({
     messageId: "",
     content: "",
-    toolOutput: undefined as ToolOutput | undefined,
+    toolOutput: [] as ToolOutput[],
   });
   const [eventSourceUrl, setEventSourceUrl] = useState<string | null>(null);
   const processingRef = useRef(false); // Add this to prevent duplicate calls
@@ -31,30 +31,50 @@ export default function Chat() {
 
   function addAssistantMessage() {
     const assistantMessageId = crypto.randomUUID();
-    setAssistantContext({ messageId: assistantMessageId, content: "", toolOutput: undefined });
+    setAssistantContext({ messageId: assistantMessageId, content: "", toolOutput: [] });
     addMessage(id as string, {
       id: assistantMessageId,
       createdAt: new Date(),
       content: "",
       isUser: false,
+      toolOutput: [],
     });
   }
 
   function updateAssistantContext(content: string, toolOutput?: ToolOutput) {
     if (content.length === 0) return;
 
-    setAssistantContext((prev) => ({
-      messageId: prev.messageId,
-      content: prev.content + content,
-      toolOutput: toolOutput
-    }));
+    setAssistantContext((prev) => {
+      if (toolOutput) {
+        console.log({
+          messageId: prev.messageId,
+          content: prev.content + content,
+          toolOutput: toolOutput
+        })
+      }
+      return {
+        messageId: prev.messageId,
+        content: prev.content + content,
+        toolOutput: [...prev.toolOutput, toolOutput || {} as ToolOutput]
+      }
+    });
+
+    if (toolOutput) {
+      console.log({
+        id: assistantContext.messageId,
+        createdAt: new Date(),
+        content: content,
+        isUser: false,
+        toolOutput: [...assistantContext.toolOutput, toolOutput || {} as ToolOutput]
+      })
+    }
 
     updateMessage(id as string, {
       id: assistantContext.messageId,
       createdAt: new Date(),
       content: content,
       isUser: false,
-      toolOutput: toolOutput
+      toolOutput: [...assistantContext.toolOutput, ...[toolOutput || {} as ToolOutput]]
     });
   }
 
@@ -76,6 +96,7 @@ export default function Chat() {
       createdAt: new Date(),
       content: message,
       isUser: true,
+      toolOutput: [],
     });
 
     // assistant message

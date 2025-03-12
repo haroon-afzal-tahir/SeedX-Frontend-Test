@@ -14,7 +14,7 @@ interface Message {
   content: string;
   createdAt: Date;
   isUser: boolean;
-  toolOutput?: ToolOutput;
+  toolOutput?: ToolOutput[];
 }
 
 interface Session {

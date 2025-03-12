@@ -6,7 +6,7 @@ import { PiPaperPlaneRightFill } from "react-icons/pi";
 
 export default function Home() {
   const router = useRouter();
-  const { sessions, addSession } = useSessions();
+  const { addSession } = useSessions();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,6 +25,7 @@ export default function Home() {
           content: message,
           createdAt: new Date(),
           isUser: true,
+          toolOutput: []
         }
       ]
     });

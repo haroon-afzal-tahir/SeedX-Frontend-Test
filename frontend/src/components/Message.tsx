@@ -50,22 +50,27 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
   };
 
   const renderToolOutput = () => {
-    if (!message.toolOutput || !message.toolOutput.type || !message.toolOutput.data) {
+    console.log(message.toolOutput)
+    if (!message.toolOutput || message.toolOutput.length === 0) {
       return null;
     }
 
-    const Component = componentObj[message.toolOutput.type];
-    if (!Component) {
-      return null;
-    }
+    const Components = message.toolOutput.map((toolOutput) => {
+      const Component = componentObj[toolOutput.type];
+      if (!Component) {
+        return null;
+      }
 
-    try {
-      const parsedData = JSON.parse(message.toolOutput.data);
-      return <Component output={parsedData?.output} />;
-    } catch (e) {
-      console.error('Error parsing tool output:', e);
-      return null;
-    }
+      try {
+        const parsedData = JSON.parse(toolOutput.data);
+        return <Component output={parsedData?.output} />;
+      } catch (e) {
+        console.error('Error parsing tool output:', e);
+        return null;
+      }
+    });
+
+    return Components;
   };
 
   return (
