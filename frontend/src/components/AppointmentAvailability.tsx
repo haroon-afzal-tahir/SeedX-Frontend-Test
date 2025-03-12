@@ -36,8 +36,6 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
         }
       })
 
-      console.log(message)
-
       if (!message) {
         addMessage(id as string, {
           id: crypto.randomUUID(),
