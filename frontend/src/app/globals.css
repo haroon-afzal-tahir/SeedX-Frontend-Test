@@ -11,7 +11,7 @@
   --appointment-time-bg: #f9fafb;
   --appointment-time-text: #1e2939;
   --appointment-time-border: #2b7fff;
-  --font-primary: "YourFontName", system-ui, sans-serif;
+  --font-primary: "Geist", system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

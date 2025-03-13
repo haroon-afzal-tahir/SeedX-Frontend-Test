@@ -25,7 +25,7 @@ export function useEventSource(
   const eventSourceRef = useRef<EventSource | null>(null);
   const urlRef = useRef<string | null>(null);
 
-  const connect = useCallback(() => {
+  const connect = () => {
     // Close any existing connection first
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -71,7 +71,7 @@ export function useEventSource(
       });
       // eventSource.close();
     };
-  }, [url, onMessage]);
+  };
 
   useEffect(() => {
     connect();
@@ -86,7 +86,7 @@ export function useEventSource(
         setIsConnected(false);
       }
     };
-  }, [url, connect]);
+  }, [url]);
 
   return { isConnected, error };
 }

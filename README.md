@@ -94,9 +94,14 @@ docker-compose up backend
 
 ### Setting Up Your Frontend
 
-1. Create your frontend application in the `frontend/` directory
-2. Create a Dockerfile similar to the example provided
-3. Configure your application to connect to the backend API at `http://localhost:8000`
+- Set the NEXT_PUBLIC_API_URL in the .env file to http://localhost:8000 on `frontend/.env`
+- Now you can run the frontend with Docker
+
+```bash
+cd frontend
+docker build -t supercar-assistant-frontend .
+docker run -p 3000:3000 supercar-assistant-frontend
+```
 
 #### Running with Docker Compose
 

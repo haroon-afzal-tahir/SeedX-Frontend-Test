@@ -30,7 +30,7 @@ export default function Chat() {
     }
   }, [session, router]);
 
-  const addAssistantMessage = useCallback(() => {
+  const addAssistantMessage = () => {
     const assistantMessageId = crypto.randomUUID();
     setAssistantContext({ messageId: assistantMessageId, content: "", toolOutput: [] });
     addMessage(id as string, {
@@ -41,7 +41,7 @@ export default function Chat() {
       triggered: false,
       toolOutput: [],
     });
-  }, [addMessage, id]);
+  };
 
   const updateAssistantContext = useCallback((content: string, toolOutput?: ToolOutput) => {
     if (content.length === 0 && !toolOutput) return;
@@ -122,7 +122,7 @@ export default function Chat() {
       addAssistantMessage();
       setEventSourceUrl(`api/query?${urlParams.toString()}`);
     }
-  }, [isInitialized, session, id, addAssistantMessage]);
+  }, [isInitialized, session, id]);
 
   useEffect(() => {
     // if the last message is triggered, add an assistant message
@@ -140,7 +140,7 @@ export default function Chat() {
         deleteMessage(id as string, triggeredMessages[0].id);
       }
     }
-  }, [session, addAssistantMessage, deleteMessage, id]);
+  }, [session]);
 
   // Using the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {
