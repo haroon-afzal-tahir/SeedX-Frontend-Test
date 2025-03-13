@@ -1,4 +1,4 @@
-FROM node:20.10-alpine
+FROM node:22.14-alpine
 
 WORKDIR /app
 
@@ -14,9 +14,9 @@ RUN npm install
 # Copy source code (node_modules will be excluded by .dockerignore)
 COPY . .
 
-# Only expose non-sensitive environment variable
-# ARG NEXT_PUBLIC_API_URL
-# ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Uncomment and properly set the environment variables
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 # ARG APP_PASSWORD
 # ENV APP_PASSWORD=${APP_PASSWORD}
