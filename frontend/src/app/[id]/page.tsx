@@ -30,7 +30,7 @@ export default function Chat() {
     }
   }, [session, router]);
 
-  function addAssistantMessage() {
+  const addAssistantMessage = useCallback(() => {
     const assistantMessageId = crypto.randomUUID();
     setAssistantContext({ messageId: assistantMessageId, content: "", toolOutput: [] });
     addMessage(id as string, {
@@ -41,7 +41,7 @@ export default function Chat() {
       triggered: false,
       toolOutput: [],
     });
-  }
+  }, [addMessage, id]);
 
   const updateAssistantContext = useCallback((content: string, toolOutput?: ToolOutput) => {
     if (content.length === 0 && !toolOutput) return;
@@ -122,7 +122,7 @@ export default function Chat() {
       addAssistantMessage();
       setEventSourceUrl(`api/query?${urlParams.toString()}`);
     }
-  }, [isInitialized, session, id]);
+  }, [isInitialized, session, id, addAssistantMessage]);
 
   useEffect(() => {
     // if the last message is triggered, add an assistant message
