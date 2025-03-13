@@ -37,7 +37,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col h-full w-full items-center justify-center gap-6">
+    <div className="flex flex-col h-full w-full items-center justify-center gap-6 px-4">
       <h1 className="text-3xl font-semibold">What would you like to do?</h1>
 
       <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg w-full relative p-4">

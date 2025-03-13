@@ -1,19 +1,20 @@
-# Build stage
-FROM node:20.10-alpine AS builder
+FROM node:20.10-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json pnpm-lock.yaml ./
+# Install necessary build dependencies including git and ca-certificates
+RUN apk add --no-cache git ca-certificates
 
-# Install pnpm and dependencies
-RUN npm i -g pnpm && \
-    pnpm i
+# Copy package files first
+COPY package*.json ./
 
-# Copy source code
+# Clean install dependencies
+RUN npm install
+
+# Copy source code (node_modules will be excluded by .dockerignore)
 COPY . .
 
-# Build the application
+# Only expose non-sensitive environment variable
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
@@ -23,25 +24,10 @@ ENV APP_PASSWORD=${APP_PASSWORD}
 ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
-RUN pnpm build
-
-# Production stage
-FROM node:20.10-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json pnpm-lock.yaml ./
-
-# Install pnpm and production dependencies only
-RUN npm i -g pnpm && \
-    pnpm i --prod
-
-# Copy built application from builder stage
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+# Build the application
+RUN npm run build
 
 EXPOSE 3000
 
 # Use production start command
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
