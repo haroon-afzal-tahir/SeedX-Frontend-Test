@@ -122,7 +122,7 @@ export default function Chat() {
       addAssistantMessage();
       setEventSourceUrl(`api/query?${urlParams.toString()}`);
     }
-  }, [isInitialized, session, id, addAssistantMessage]);
+  }, [isInitialized, session, id]);
 
   useEffect(() => {
     // if the last message is triggered, add an assistant message
@@ -140,7 +140,7 @@ export default function Chat() {
         deleteMessage(id as string, triggeredMessages[0].id);
       }
     }
-  }, [session]);
+  }, [session, addAssistantMessage, deleteMessage, id]);
 
   // Using the custom hook to handle EventSource
   useEventSource(eventSourceUrl, (message) => {

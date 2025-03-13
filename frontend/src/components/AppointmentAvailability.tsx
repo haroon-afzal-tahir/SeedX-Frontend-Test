@@ -2,7 +2,6 @@
 
 import { useSessions } from "@/context/sessions.context";
 import { useParams } from "next/navigation";
-import { useState } from "react";
 
 export const AppointmentAvailability = ({ output }: { output: string }) => {
   // Parse the string to get the array of times

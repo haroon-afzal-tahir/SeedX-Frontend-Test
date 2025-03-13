@@ -8,7 +8,7 @@ import { Weather } from "./Weather";
 export const Message = ({ message, assistantMessageId, isComplete }: { message: Message, assistantMessageId: string, isComplete: boolean }) => {
   const isUser = message.isUser;
 
-  const componentObj: Record<ToolOutputType, ({ output }: { output: any }) => JSX.Element> = {
+  const componentObj: Record<ToolOutputType, ({ output }: { output: string }) => JSX.Element> = {
     check_appointment_availability: AppointmentAvailability,
     schedule_appointment: AppointmentConfirmation,
     get_dealership_address: DealershipAddress,

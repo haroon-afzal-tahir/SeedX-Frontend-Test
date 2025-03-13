@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 
 interface EventSourceMessage {
@@ -55,7 +54,7 @@ export function useEventSource(
         if (event.data.startsWith(": ping")) return;
         const parsed = parseResponse(event.data);
         onMessage(parsed);
-      } catch (err) {
+      } catch {
         onMessage({
           event: "error",
           data: "Failed to handle message",
@@ -87,7 +86,7 @@ export function useEventSource(
         setIsConnected(false);
       }
     };
-  }, [url]);
+  }, [url, connect]);
 
   return { isConnected, error };
 }
