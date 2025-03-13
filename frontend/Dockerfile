@@ -1,17 +1,14 @@
-FROM node:20.10-alpine
+# Build stage
+FROM node:20.10-alpine AS builder
 
 WORKDIR /app
 
-#remove .next and node_modules
-RUN rm -rf .next node_modules
-
 # Copy package files
-COPY package*.json ./
-COPY package-lock.json ./
+COPY package*.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN npm cache clean --force && \
-    npm i
+# Install pnpm and dependencies
+RUN npm i -g pnpm && \
+    pnpm i
 
 # Copy source code
 COPY . .
@@ -26,6 +23,25 @@ ENV APP_PASSWORD=${APP_PASSWORD}
 ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
+RUN pnpm build
+
+# Production stage
+FROM node:20.10-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json pnpm-lock.yaml ./
+
+# Install pnpm and production dependencies only
+RUN npm i -g pnpm && \
+    pnpm i --prod
+
+# Copy built application from builder stage
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# Use production start command
+CMD ["pnpm", "start"]

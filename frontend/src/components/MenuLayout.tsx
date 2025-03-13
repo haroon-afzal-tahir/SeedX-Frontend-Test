@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { IoCarSportSharp } from "react-icons/io5";
 import { BiArrowToRight, BiArrowBack } from "react-icons/bi";
 
-export function ClientLayout() {
+export function MenuLayout() {
   // Add sidebar state management
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [windowWidth, setWindowWidth] = useState(0);

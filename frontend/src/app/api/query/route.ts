@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     async start(controller) {
       try {
         const response = await fetch(
-          `${process.env.API_URL}/query?${searchParams.toString()}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/query?${searchParams.toString()}`,
           {
             method: "POST",
             headers: {
