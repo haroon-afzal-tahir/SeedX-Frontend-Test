@@ -122,6 +122,7 @@ export default function Chat() {
       addAssistantMessage();
       setEventSourceUrl(`api/query?${urlParams.toString()}`);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, session, id]);
 
   useEffect(() => {
@@ -140,6 +141,7 @@ export default function Chat() {
         deleteMessage(id as string, triggeredMessages[0].id);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   // Using the custom hook to handle EventSource

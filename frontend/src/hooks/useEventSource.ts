@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface EventSourceMessage {
   event: string;
@@ -86,6 +86,7 @@ export function useEventSource(
         setIsConnected(false);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
   return { isConnected, error };
