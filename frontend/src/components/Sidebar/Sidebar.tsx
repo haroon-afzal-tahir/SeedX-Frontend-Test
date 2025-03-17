@@ -8,7 +8,7 @@ import { IoCarSportSharp } from "react-icons/io5";
 import { useSessions } from "@/context/sessions.context";
 import { SessionList } from "./SessionList";
 import { useSidebarAnimation } from "./hooks/useSidebarAnimation";
-import { useOutsideClick } from '@/hooks/useOutsideClick';
+import { useDevice } from "@/hooks/useDevice";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,14 +21,9 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { id } = useParams();
   const router = useRouter();
-  const menuRef = useRef<HTMLDivElement>(null);
 
   const margin = useSidebarAnimation(isOpen);
-  useOutsideClick(menuRef, () => {
-    if (openMenuId !== null) {
-      setOpenMenuId(null);
-    }
-  });
+  const { isMobile } = useDevice();
 
   const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,7 +41,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   };
 
   const handleLinkClick = () => {
-    if (window.innerWidth < 768) {
+    if (isMobile) {
       setIsOpen(false);
     }
   };
@@ -61,13 +56,16 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/30 backdrop-blur-sm md:hidden z-[5]"
-          onClick={() => setIsOpen(false)}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsOpen(false);
+            }
+          }}
         />
       )}
       <div
-        ref={menuRef}
         className="bg-gradient-to-b from-sidebar to-sidebar/95 h-full flex flex-col gap-3 
-        md:static fixed z-[40] border-r border-border/40 backdrop-blur-md"
+          md:static fixed z-[1000] border-r border-border/40 backdrop-blur-md"
         style={{
           marginLeft: margin,
           width: 280,
@@ -79,7 +77,9 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             className="md:hidden rounded-full bg-background/50 px-4 py-2.5 
               hover:bg-background/70 self-start text-sm group flex items-center gap-2
               transition-all duration-200 border border-border/40"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => {
+              setIsOpen(false);
+            }}
           >
             <BiArrowBack className="text-foreground/70 group-hover:translate-x-[-2px] transition-transform" />
             <span>Close</span>

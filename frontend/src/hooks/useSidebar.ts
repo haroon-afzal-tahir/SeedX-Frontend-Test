@@ -31,14 +31,9 @@ export function useSidebar() {
     };
   }, [isSidebarOpen, isMobile]);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
   return {
     isSidebarOpen,
     setIsSidebarOpen,
-    toggleSidebar,
     isMobile,
     isDesktop,
   };

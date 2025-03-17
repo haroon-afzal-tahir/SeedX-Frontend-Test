@@ -6,7 +6,7 @@ import { useSidebar } from "@/hooks/useSidebar";
 import { Sidebar } from "./Sidebar/Sidebar";
 
 export function MenuLayout() {
-  const { isSidebarOpen, setIsSidebarOpen, toggleSidebar } = useSidebar();
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
 
   return (
     <>
@@ -15,7 +15,9 @@ export function MenuLayout() {
         <div className="flex items-center justify-center gap-2 relative flex-1">
           <button
             className="p-2 md:hidden hover:bg-neutral-200 dark:hover:bg-neutral-800 absolute left-4 top-1/2 transform -translate-y-1/2 rounded-md transition-all self-start cursor-pointer"
-            onClick={toggleSidebar}
+            onClick={() => {
+              setIsSidebarOpen(true);
+            }}
           >
             <BiArrowToRight size={20} />
           </button>
