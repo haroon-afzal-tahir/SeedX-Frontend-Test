@@ -55,6 +55,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       {/* Add overlay for mobile */}
       {isOpen && (
         <div
+          data-sidebar-overlay
           className="fixed inset-0 bg-black/30 backdrop-blur-sm md:hidden z-[5]"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
@@ -64,6 +65,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         />
       )}
       <div
+        data-sidebar
         className="bg-gradient-to-b from-sidebar to-sidebar/95 h-full flex flex-col gap-3 
           md:static fixed z-[1000] border-r border-border/40 backdrop-blur-md"
         style={{

@@ -19,7 +19,11 @@ export function useSidebar() {
     const handleClickOutside = (event: MouseEvent) => {
       if (isMobile) {
         const target = event.target as HTMLElement;
-        if (!target.closest(".bg-sidebar") && isSidebarOpen) {
+        // Check if the click is outside both the sidebar and its overlay
+        const isSidebarClick = target.closest("[data-sidebar]");
+        const isOverlayClick = target.closest("[data-sidebar-overlay]");
+
+        if (!isSidebarClick && !isOverlayClick && isSidebarOpen) {
           setIsSidebarOpen(false);
         }
       }
