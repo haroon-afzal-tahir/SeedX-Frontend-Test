@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-const WIDTH = 250;
-const ANIMATION_SPEED = 0.2;
+const WIDTH = 280;
+const ANIMATION_SPEED = 0.8;
 
 export const useSidebarAnimation = (isOpen: boolean) => {
   const [margin, setMargin] = useState(-WIDTH);
@@ -15,11 +15,19 @@ export const useSidebarAnimation = (isOpen: boolean) => {
       if (!start) start = timestamp;
       const progress = (timestamp - start) * ANIMATION_SPEED;
       const distance = target - margin;
-      const movement = Math.min(Math.abs(distance), progress);
 
-      setMargin(margin + (distance > 0 ? movement : -movement));
+      const easeOutExpo = (x: number): number => {
+        return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+      };
 
-      if (Math.abs(distance) > 0.5) {
+      const easedProgress = easeOutExpo(Math.min(progress / WIDTH, 1));
+      const newMargin = isOpen
+        ? -WIDTH + WIDTH * easedProgress
+        : -WIDTH * easedProgress;
+
+      setMargin(newMargin);
+
+      if (progress < WIDTH) {
         frameId = requestAnimationFrame(animate);
       } else {
         setMargin(target);
@@ -29,7 +37,7 @@ export const useSidebarAnimation = (isOpen: boolean) => {
     frameId = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(frameId);
-  }, [isOpen, margin]);
+  }, [isOpen]);
 
   return margin;
 };

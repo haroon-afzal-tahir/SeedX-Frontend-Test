@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { MdMoreHoriz, MdDelete } from "react-icons/md";
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 
@@ -18,37 +18,49 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
     }
   });
 
+  useEffect(() => {
+    if (openMenuId === sessionId && menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      menuRef.current.style.setProperty('--menu-top', `${rect.bottom + 8}px`);
+      menuRef.current.style.setProperty('--menu-left', `${rect.right - 192}px`); // 192px is the width of the menu (w-48)
+    }
+  }, [openMenuId, sessionId]);
+
   return (
-    <div ref={menuRef} className="relative menu-container z-20">
+    <div ref={menuRef} className="relative menu-container">
       <button
         onClick={(e) => toggleMenu(sessionId, e)}
         className={`
-          hover:bg-sidebar-hover rounded-md p-1.5
-          transition-all duration-200 ease-out cursor-pointer
+          rounded-lg p-1.5 transition-all duration-200
           ${openMenuId === sessionId
-            ? 'opacity-100 bg-sidebar-hover'
-            : 'opacity-0 group-hover:opacity-100'
+            ? 'bg-blue-500/10 text-blue-500'
+            : 'opacity-0 group-hover:opacity-100 hover:bg-background/70'
           }
         `}
       >
-        <MdMoreHoriz className="text-foreground/70" />
+        <MdMoreHoriz className="text-lg" />
       </button>
 
       {openMenuId === sessionId && (
         <div className="
-          absolute right-0 top-8 w-40 bg-background/95 backdrop-blur-sm
-          shadow-lg rounded-lg border border-border/40 py-1 
-          animate-fadeIn
-        ">
+          fixed w-48 bg-background/95 backdrop-blur-xl
+          shadow-lg rounded-xl border border-border/40 py-1.5
+          animate-fadeIn z-[60]
+        "
+          style={{
+            top: 'var(--menu-top)',
+            left: 'var(--menu-left)'
+          }}
+        >
           <button
             onClick={(e) => handleDeleteSession(sessionId, e)}
             className="
-              flex items-center gap-2 w-full px-3 py-2 text-left
-              text-sm text-red-500 hover:bg-red-500/10 transition-colors
-              cursor-pointer
+              flex items-center gap-2 w-full px-4 py-2.5 text-left
+              text-sm text-red-500 hover:bg-red-500/10 transition-all
+              cursor-pointer font-medium
             "
           >
-            <MdDelete />
+            <MdDelete className="text-lg" />
             Delete Chat
           </button>
         </div>

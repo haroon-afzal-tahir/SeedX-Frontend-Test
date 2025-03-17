@@ -1,9 +1,9 @@
 "use client";
 
-import { Sidebar } from "@/components/Sidebar";
 import { IoCarSportSharp } from "react-icons/io5";
 import { BiArrowToRight } from "react-icons/bi";
 import { useSidebar } from "@/hooks/useSidebar";
+import { Sidebar } from "./Sidebar/Sidebar";
 
 export function MenuLayout() {
   const { isSidebarOpen, setIsSidebarOpen, toggleSidebar } = useSidebar();

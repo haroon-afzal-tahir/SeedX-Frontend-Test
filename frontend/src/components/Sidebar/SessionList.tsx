@@ -19,29 +19,37 @@ export const SessionList = ({ sessions, currentId, openMenuId, toggleMenu, handl
           href={`/${session.id}`}
           onClick={handleLinkClick}
           className={`
-            flex group relative h-11 overflow-visible items-center justify-between
-            cursor-pointer transition-all px-3 py-2.5 rounded-md w-full text-sm
+            group relative overflow-hidden rounded-lg
+            transition-all duration-200 hover:shadow-sm
             ${currentId === session.id
-              ? 'bg-background shadow-sm font-medium'
-              : 'hover:bg-background/50'
+              ? 'bg-blue-500/10 border border-blue-500/20'
+              : 'hover:bg-background/50 border border-transparent hover:border-border/40'
             }
           `}
         >
-          <span className={`
-            truncate transition-all duration-200 ease-out
-            ${currentId === session.id
-              ? 'translate-x-1 text-foreground'
-              : 'text-foreground/70 group-hover:translate-x-1 group-hover:text-foreground'
-            }
-          `}>
-            {session.name}
-          </span>
+          <div className="flex items-center justify-between px-3 py-2.5 relative z-10">
+            <span className={`
+              truncate text-sm transition-all duration-200
+              ${currentId === session.id
+                ? 'text-blue-500 font-medium'
+                : 'text-foreground/70 group-hover:text-foreground'
+              }
+            `}>
+              {session.name}
+            </span>
 
-          <SidebarMenu
-            sessionId={session.id}
-            openMenuId={openMenuId}
-            toggleMenu={toggleMenu}
-            handleDeleteSession={handleDeleteSession}
+            <SidebarMenu
+              sessionId={session.id}
+              openMenuId={openMenuId}
+              toggleMenu={toggleMenu}
+              handleDeleteSession={handleDeleteSession}
+            />
+          </div>
+          <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 
+            transition-opacity duration-300 bg-gradient-to-r 
+            ${currentId === session.id
+              ? 'from-blue-500/5 to-transparent'
+              : 'from-background/50 to-transparent'}`}
           />
         </Link>
       ))}

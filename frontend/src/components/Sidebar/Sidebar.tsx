@@ -66,35 +66,56 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       )}
       <div
         ref={menuRef}
-        className="bg-sidebar h-full w-64 p-4 flex flex-col gap-3 md:static fixed shadow-xl z-10 border-r border-border/40"
+        className="bg-gradient-to-b from-sidebar to-sidebar/95 h-full flex flex-col gap-3 
+        md:static fixed z-[40] border-r border-border/40 backdrop-blur-md"
         style={{
           marginLeft: margin,
-          width: 250,
-          transition: 'box-shadow 0.2s ease-in-out'
+          width: 280,
+          transition: 'all 0.2s ease-in-out',
         }}
       >
-        <button
-          className="p-2 md:hidden rounded-md transition-all hover:bg-background/80 self-start cursor-pointer flex items-center gap-2 text-sm"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <BiArrowBack className="text-foreground/70" />
-          <span>Close menu</span>
-        </button>
+        <div className="p-4 flex flex-col gap-3">
+          <button
+            className="md:hidden rounded-full bg-background/50 px-4 py-2.5 
+              hover:bg-background/70 self-start text-sm group flex items-center gap-2
+              transition-all duration-200 border border-border/40"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <BiArrowBack className="text-foreground/70 group-hover:translate-x-[-2px] transition-transform" />
+            <span>Close</span>
+          </button>
 
-        <Link
-          href="/"
-          onClick={handleLinkClick}
-          className={`p-3 rounded-lg transition-all hover:bg-background/80 ${id == null ? 'bg-background shadow-sm' : ''
-            } flex items-center gap-3 w-full text-sm font-medium`}
-        >
-          <IoCarSportSharp className="text-blue-500" fontSize={20} />
-          <span>SuperCar Assistant</span>
-        </Link>
+          <Link
+            href="/"
+            onClick={handleLinkClick}
+            className={`relative overflow-hidden rounded-xl p-4 transition-all 
+              ${id == null ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' :
+                'bg-background/50 hover:bg-background/70 border border-border/40'} 
+              flex items-center gap-3 group`}
+          >
+            <div className="relative z-10 flex items-center gap-3">
+              <IoCarSportSharp
+                className={`transition-transform duration-300 text-xl
+                  ${id == null ? 'text-white' : 'text-blue-500'}`}
+              />
+              <span className="font-medium">New Chat</span>
+            </div>
+            <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 
+              transition-opacity duration-300 bg-gradient-to-r 
+              ${id == null ? 'from-blue-600/50 to-blue-400/50' :
+                'from-background/50 to-transparent'}`}
+            />
+          </Link>
+        </div>
 
         {mounted && sessions.length > 0 && (
           <>
-            <div className="h-px bg-border/40 my-1" />
-            <div className="flex-1 overflow-y-auto">
+            <div className="px-4 flex items-center gap-2 text-xs text-foreground/50 font-medium">
+              <div className="h-px flex-1 bg-gradient-to-r from-border/40 to-transparent" />
+              Recent Chats
+              <div className="h-px flex-1 bg-gradient-to-l from-border/40 to-transparent" />
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
               <SessionList
                 sessions={sessions}
                 currentId={id as string | null}
