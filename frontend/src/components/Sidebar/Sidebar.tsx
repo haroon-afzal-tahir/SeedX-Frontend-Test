@@ -56,40 +56,57 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   }, []);
 
   return (
-    <div
-      ref={menuRef}
-      className="bg-sidebar h-full w-64 p-4 flex flex-col gap-2 md:static fixed shadow-lg z-10"
-      style={{ marginLeft: margin, width: 250 }}
-    >
-      <button
-        className="p-2 md:hidden rounded-md transition-all hover:bg-background self-start cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <BiArrowBack />
-      </button>
-
-      <Link
-        href="/"
-        onClick={handleLinkClick}
-        className={`p-2 rounded-md transition-all hover:bg-background ${id == null ? 'bg-background gap-6' : ''
-          } flex justify-center items-center gap-2 w-full text-sm text-center`}
-      >
-        <IoCarSportSharp fontSize={20} /> SuperCar Assistant
-      </Link>
-
-      {mounted && sessions.length > 0 && (
-        <>
-          <hr className="my-2" />
-          <SessionList
-            sessions={sessions}
-            currentId={id as string | null}
-            openMenuId={openMenuId}
-            toggleMenu={toggleMenu}
-            handleDeleteSession={handleDeleteSession}
-            handleLinkClick={handleLinkClick}
-          />
-        </>
+    <>
+      {/* Add overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm md:hidden z-[5]"
+          onClick={() => setIsOpen(false)}
+        />
       )}
-    </div>
+      <div
+        ref={menuRef}
+        className="bg-sidebar h-full w-64 p-4 flex flex-col gap-3 md:static fixed shadow-xl z-10 border-r border-border/40"
+        style={{
+          marginLeft: margin,
+          width: 250,
+          transition: 'box-shadow 0.2s ease-in-out'
+        }}
+      >
+        <button
+          className="p-2 md:hidden rounded-md transition-all hover:bg-background/80 self-start cursor-pointer flex items-center gap-2 text-sm"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <BiArrowBack className="text-foreground/70" />
+          <span>Close menu</span>
+        </button>
+
+        <Link
+          href="/"
+          onClick={handleLinkClick}
+          className={`p-3 rounded-lg transition-all hover:bg-background/80 ${id == null ? 'bg-background shadow-sm' : ''
+            } flex items-center gap-3 w-full text-sm font-medium`}
+        >
+          <IoCarSportSharp className="text-blue-500" fontSize={20} />
+          <span>SuperCar Assistant</span>
+        </Link>
+
+        {mounted && sessions.length > 0 && (
+          <>
+            <div className="h-px bg-border/40 my-1" />
+            <div className="flex-1 overflow-y-auto">
+              <SessionList
+                sessions={sessions}
+                currentId={id as string | null}
+                openMenuId={openMenuId}
+                toggleMenu={toggleMenu}
+                handleDeleteSession={handleDeleteSession}
+                handleLinkClick={handleLinkClick}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 }; 

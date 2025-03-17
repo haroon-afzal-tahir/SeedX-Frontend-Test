@@ -44,7 +44,7 @@ export default function Home() {
         <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12 text-sm" autoFocus />
 
         <button type="submit" className="bg-blue-500 p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
-          <PiPaperPlaneRightFill className="text-background" />
+          <PiPaperPlaneRightFill className="text-white" />
         </button>
       </form>
     </div>

@@ -19,22 +19,37 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
   });
 
   return (
-    <div ref={menuRef} className="relative menu-container">
+    <div ref={menuRef} className="relative menu-container z-20">
       <button
         onClick={(e) => toggleMenu(sessionId, e)}
-        className={`hover:bg-sidebar-hover group-hover:opacity-100 ${openMenuId === sessionId ? 'opacity-100' : 'opacity-0'} transition-all cursor-pointer rounded-md p-1`}
+        className={`
+          hover:bg-sidebar-hover rounded-md p-1.5
+          transition-all duration-200 ease-out cursor-pointer
+          ${openMenuId === sessionId
+            ? 'opacity-100 bg-sidebar-hover'
+            : 'opacity-0 group-hover:opacity-100'
+          }
+        `}
       >
-        <MdMoreHoriz />
+        <MdMoreHoriz className="text-foreground/70" />
       </button>
 
       {openMenuId === sessionId && (
-        <div className="absolute right-0 top-8 w-36 bg-background shadow-lg rounded-md z-10">
+        <div className="
+          absolute right-0 top-8 w-40 bg-background/95 backdrop-blur-sm
+          shadow-lg rounded-lg border border-border/40 py-1 
+          animate-fadeIn
+        ">
           <button
             onClick={(e) => handleDeleteSession(sessionId, e)}
-            className="flex items-center gap-2 w-full px-3 py-2 text-left rounded-md text-sm text-red-500 cursor-pointer"
+            className="
+              flex items-center gap-2 w-full px-3 py-2 text-left
+              text-sm text-red-500 hover:bg-red-500/10 transition-colors
+              cursor-pointer
+            "
           >
-            <MdDelete className="text-red-500" />
-            Delete
+            <MdDelete />
+            Delete Chat
           </button>
         </div>
       )}

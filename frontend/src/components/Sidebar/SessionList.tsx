@@ -12,16 +12,28 @@ interface SessionListProps {
 
 export const SessionList = ({ sessions, currentId, openMenuId, toggleMenu, handleDeleteSession, handleLinkClick }: SessionListProps) => {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
       {sessions.map((session) => (
         <Link
           key={session.id}
           href={`/${session.id}`}
           onClick={handleLinkClick}
-          className={`flex group relative h-10 overflow-visible items-center justify-between cursor-pointer transition-all p-2 rounded-md w-full text-sm truncate ${currentId === session.id ? 'bg-background' : 'hover:bg-sidebar-hover'
-            }`}
+          className={`
+            flex group relative h-11 overflow-visible items-center justify-between
+            cursor-pointer transition-all px-3 py-2.5 rounded-md w-full text-sm
+            ${currentId === session.id
+              ? 'bg-background shadow-sm font-medium'
+              : 'hover:bg-background/50'
+            }
+          `}
         >
-          <span className={`truncate group-hover:ml-4 transition-all ${currentId === session.id ? '!ml-6' : ''}`}>
+          <span className={`
+            truncate transition-all duration-200 ease-out
+            ${currentId === session.id
+              ? 'translate-x-1 text-foreground'
+              : 'text-foreground/70 group-hover:translate-x-1 group-hover:text-foreground'
+            }
+          `}>
             {session.name}
           </span>
 

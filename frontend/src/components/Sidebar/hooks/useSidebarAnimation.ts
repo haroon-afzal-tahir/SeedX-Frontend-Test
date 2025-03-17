@@ -1,29 +1,32 @@
 import { useState, useEffect } from "react";
 
 const WIDTH = 250;
-const ANIMATION_SPEED = 0.15;
+const ANIMATION_SPEED = 0.2;
 
 export const useSidebarAnimation = (isOpen: boolean) => {
-  const [margin, setMargin] = useState(0);
+  const [margin, setMargin] = useState(-WIDTH);
 
   useEffect(() => {
     const target = isOpen ? 0 : -WIDTH;
+    let start: number | null = null;
     let frameId: number;
 
-    function animatePosition() {
+    function animate(timestamp: number) {
+      if (!start) start = timestamp;
+      const progress = (timestamp - start) * ANIMATION_SPEED;
       const distance = target - margin;
-      const movement = distance * ANIMATION_SPEED;
+      const movement = Math.min(Math.abs(distance), progress);
 
-      if (Math.abs(distance) < 0.5) {
+      setMargin(margin + (distance > 0 ? movement : -movement));
+
+      if (Math.abs(distance) > 0.5) {
+        frameId = requestAnimationFrame(animate);
+      } else {
         setMargin(target);
-        return;
       }
-
-      setMargin(margin + movement);
-      frameId = requestAnimationFrame(animatePosition);
     }
 
-    frameId = requestAnimationFrame(animatePosition);
+    frameId = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(frameId);
   }, [isOpen, margin]);

@@ -1,9 +1,9 @@
 import type { JSX } from 'react';
 
-import { AppointmentAvailability } from "./AppointmentAvailability";
-import { AppointmentConfirmation } from "./AppointmentConfirmation";
-import { DealershipAddress } from "./DealershipAddress";
-import { Weather } from "./Weather";
+import { AppointmentAvailability } from "./Tools/AppointmentAvailability";
+import { AppointmentConfirmation } from "./Tools/AppointmentConfirmation";
+import { DealershipAddress } from "./Tools/DealershipAddress";
+import { Weather } from "./Tools/Weather";
 
 export const Message = ({ message, assistantMessageId, isComplete }: { message: Message, assistantMessageId: string, isComplete: boolean }) => {
   const isUser = message.isUser;

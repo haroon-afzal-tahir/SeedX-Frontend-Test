@@ -144,6 +144,8 @@ export default function Chat() {
           query: session?.messages[session.messages.length - 1].content || "",
         });
         addAssistantMessage();
+        setIsLoading(true);
+        processingRef.current = true;
         setEventSourceUrl(`api/query?${urlParams.toString()}`);
       } else {
         deleteMessage(id as string, triggeredMessages[0].id);
@@ -172,16 +174,6 @@ export default function Chat() {
       setIsLoading(false);
     }
   });
-
-  const LoadingIndicator = () => (
-    <div className="flex items-center space-x-2 p-2">
-      <div className="animate-pulse flex space-x-1">
-        <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
-        <div className="h-2 w-2 bg-gray-400 rounded-full animation-delay-200"></div>
-        <div className="h-2 w-2 bg-gray-400 rounded-full animation-delay-400"></div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="flex flex-col gap-4 py-4 overflow-y-auto w-full justify-between h-full">
@@ -212,7 +204,7 @@ export default function Chat() {
             disabled={isLoading}
             className={`bg-blue-500 p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer transition-opacity ${isLoading ? 'opacity-50' : 'hover:opacity-80'}`}
           >
-            <PiPaperPlaneRightFill className="text-background" />
+            <PiPaperPlaneRightFill className="text-white" />
           </button>
         </form>
       </div>
