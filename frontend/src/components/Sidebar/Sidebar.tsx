@@ -67,7 +67,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       <div
         data-sidebar
         className="bg-gradient-to-b from-sidebar to-sidebar/95 h-full flex flex-col gap-3 
-          md:static fixed z-[1000] border-r border-border/40 backdrop-blur-md"
+          md:static fixed z-10 border-r border-border/40 backdrop-blur-md"
         style={{
           marginLeft: margin,
           width: 280,

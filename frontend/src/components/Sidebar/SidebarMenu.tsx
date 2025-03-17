@@ -25,6 +25,7 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
   return (
     <div className="relative menu-container">
       <button
+        ref={buttonRef}
         onClick={(e) => toggleMenu(sessionId, e)}
         className={`
           rounded-lg p-1.5 transition-all duration-200
