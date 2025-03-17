@@ -1,66 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { IoCarSportSharp } from "react-icons/io5";
 import { BiArrowToRight } from "react-icons/bi";
+import { useSidebar } from "@/hooks/useSidebar";
 
 export function MenuLayout() {
-  // Add sidebar state management
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [windowWidth, setWindowWidth] = useState(0);
-
-  // Track window width for responsive behavior
-  useEffect(() => {
-    // Set initial width
-    setWindowWidth(window.innerWidth);
-
-    // Update width on resize
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Handle responsive sidebar behavior ONLY on window resize
-  useEffect(() => {
-    const isDesktop = windowWidth >= 768; // md breakpoint
-
-    // Skip the initial render (when windowWidth is first set)
-    if (windowWidth === 0) return;
-
-    // Only auto-adjust on window resize, not when sidebar state changes
-    if (isDesktop) {
-      setIsSidebarOpen(true);
-    } else if (!isDesktop) {
-      setIsSidebarOpen(false);
-    }
-  }, [windowWidth]); // Remove isSidebarOpen dependency
-
-  // Add click outside handler
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Only handle clicks in mobile view
-      if (windowWidth < 768) {
-        const target = event.target as HTMLElement;
-        // Check if click is outside sidebar and sidebar is open
-        if (!target.closest('.bg-sidebar') && isSidebarOpen) {
-          setIsSidebarOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isSidebarOpen, windowWidth]);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const { isSidebarOpen, setIsSidebarOpen, toggleSidebar } = useSidebar();
 
   return (
     <>
