@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MdMoreHoriz, MdDelete } from "react-icons/md";
+import { useOutsideClick } from '@/hooks/useOutsideClick';
 
 interface SidebarMenuProps {
   sessionId: string;
@@ -12,6 +13,16 @@ interface SidebarMenuProps {
 export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSession }: SidebarMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(containerRef, () => {
+    if (openMenuId === sessionId) {
+      toggleMenu(sessionId, {
+        preventDefault: () => { },
+        stopPropagation: () => { },
+      } as React.MouseEvent);
+    }
+  });
 
   useEffect(() => {
     if (openMenuId === sessionId && buttonRef.current && menuRef.current) {
@@ -23,7 +34,7 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
   }, [openMenuId, sessionId]);
 
   return (
-    <div className="relative menu-container">
+    <div ref={containerRef} className="relative menu-container">
       <button
         ref={buttonRef}
         onClick={(e) => toggleMenu(sessionId, e)}
