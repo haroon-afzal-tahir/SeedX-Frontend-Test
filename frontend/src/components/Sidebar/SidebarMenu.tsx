@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { MdMoreHoriz, MdDelete } from "react-icons/md";
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 
@@ -11,6 +12,7 @@ interface SidebarMenuProps {
 
 export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSession }: SidebarMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useOutsideClick(menuRef, () => {
     if (openMenuId === sessionId) {
@@ -19,16 +21,18 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
   });
 
   useEffect(() => {
-    if (openMenuId === sessionId && menuRef.current) {
-      const rect = menuRef.current.getBoundingClientRect();
-      menuRef.current.style.setProperty('--menu-top', `${rect.bottom + 8}px`);
-      menuRef.current.style.setProperty('--menu-left', `${rect.right - 192}px`); // 192px is the width of the menu (w-48)
+    if (openMenuId === sessionId && buttonRef.current && menuRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      menuRef.current.style.position = 'fixed';
+      menuRef.current.style.top = `${rect.bottom + 8}px`;
+      menuRef.current.style.left = `${rect.right - 192}px`; // 192px is the width of the menu (w-48)
     }
   }, [openMenuId, sessionId]);
 
   return (
-    <div ref={menuRef} className="relative menu-container">
+    <div className="relative menu-container">
       <button
+        ref={buttonRef}
         onClick={(e) => toggleMenu(sessionId, e)}
         className={`
           rounded-lg p-1.5 transition-all duration-200
@@ -41,16 +45,14 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
         <MdMoreHoriz className="text-lg" />
       </button>
 
-      {openMenuId === sessionId && (
-        <div className="
-          fixed w-48 bg-background/95 backdrop-blur-xl
-          shadow-lg rounded-xl border border-border/40 py-1.5
-          animate-fadeIn z-[60]
-        "
-          style={{
-            top: 'var(--menu-top)',
-            left: 'var(--menu-left)'
-          }}
+      {openMenuId === sessionId && createPortal(
+        <div
+          ref={menuRef}
+          className="
+            fixed w-48 bg-background/95 backdrop-blur-xl
+            shadow-lg rounded-xl border border-border/40 py-1.5
+            animate-fadeIn z-[999]
+          "
         >
           <button
             onClick={(e) => handleDeleteSession(sessionId, e)}
@@ -63,7 +65,8 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
             <MdDelete className="text-lg" />
             Delete Chat
           </button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

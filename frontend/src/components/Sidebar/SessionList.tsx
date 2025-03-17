@@ -20,7 +20,7 @@ export const SessionList = ({ sessions, currentId, openMenuId, toggleMenu, handl
           onClick={handleLinkClick}
           className={`
             group relative overflow-hidden rounded-lg
-            transition-all duration-200 hover:shadow-sm
+            transition-all duration-200 hover:shadow-sm z-[1]
             ${currentId === session.id
               ? 'bg-blue-500/10 border border-blue-500/20'
               : 'hover:bg-background/50 border border-transparent hover:border-border/40'
