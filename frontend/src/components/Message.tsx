@@ -72,15 +72,26 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className={`items-center rounded-[1.5rem] px-4 py-3 text-sm text-wrap ${isUser ? "self-end bg-sidebar max-w-96" : "self-start bg-transparent"}`}>
+    <div className="flex flex-col gap-2 animate-fadeIn">
+      <div
+        className={`
+          items-center rounded-[1.5rem] px-4 py-3 text-sm text-wrap
+          transition-all duration-200 ease-in-out
+          ${isUser
+            ? "self-end bg-blue-500 text-white shadow-sm hover:bg-blue-600 max-w-96"
+            : "self-start bg-sidebar shadow-sm hover:bg-sidebar-hover"}
+        `}
+      >
         {renderMessageContent()}
         {!isUser && !isComplete && assistantMessageId === message.id && (
-          <div className="inline-block align-middle h-2.5 w-2.5 bg-gray-300 rounded-full ml-1 shrink-0" />
+          <div className="inline-flex space-x-1 ml-2">
+            <div className="animate-bounce h-2 w-2 bg-gray-400 rounded-full"></div>
+            <div className="animate-bounce h-2 w-2 bg-gray-400 rounded-full animation-delay-200"></div>
+            <div className="animate-bounce h-2 w-2 bg-gray-400 rounded-full animation-delay-400"></div>
+          </div>
         )}
       </div>
-      <div className='px-4'>
-
+      <div className='px-4 space-y-2'>
         {renderToolOutput()}
       </div>
     </div>

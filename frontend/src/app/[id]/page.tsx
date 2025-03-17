@@ -20,6 +20,7 @@ export default function Chat() {
   const processingRef = useRef(false); // Add this to prevent duplicate calls
   const [isInitialized, setIsInitialized] = useState(false);
   const lastContentRef = useRef<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const session = getSession(id as string);
 
@@ -81,12 +82,19 @@ export default function Chat() {
     if (processingRef.current) return;
 
     setEventSourceUrl(null);
-
+    setIsLoading(true);
     processingRef.current = true;
 
     const formData = new FormData(e.target as HTMLFormElement);
     const message = formData.get("message") as string;
-    (e.target as HTMLFormElement).reset(); // Clear the form
+    (e.target as HTMLFormElement).reset();
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 100);
 
     // user message
     addMessage(id as string, {
@@ -157,11 +165,23 @@ export default function Chat() {
     } else if (message.event === "end") {
       processingRef.current = false;
       setEventSourceUrl(null);
+      setIsLoading(false);
     } else if (message.event === "error") {
       setEventSourceUrl(null);
       processingRef.current = false;
+      setIsLoading(false);
     }
   });
+
+  const LoadingIndicator = () => (
+    <div className="flex items-center space-x-2 p-2">
+      <div className="animate-pulse flex space-x-1">
+        <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+        <div className="h-2 w-2 bg-gray-400 rounded-full animation-delay-200"></div>
+        <div className="h-2 w-2 bg-gray-400 rounded-full animation-delay-400"></div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-4 py-4 overflow-y-auto w-full justify-between h-full">
@@ -176,10 +196,22 @@ export default function Chat() {
         ))}
       </div>
 
-      <div className="px-4 md:h-fit h-[100px]">
-        <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg relative p-4">
-          <input type="text" name="message" placeholder="Write your message..." autoComplete="off" className="w-full rounded-md outline-0 pr-12 text-sm" autoFocus />
-          <button type="submit" disabled={processingRef.current} className="bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
+      <div className="px-4 md:h-fit h-[100px] sticky bottom-0 bg-background/80 backdrop-blur-sm">
+        <form onSubmit={handleSubmit} className="bg-sidebar rounded-lg relative shadow-lg">
+          <input
+            type="text"
+            name="message"
+            placeholder="Write your message..."
+            autoComplete="off"
+            className="w-full rounded-md outline-0 pr-12 p-4 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+            autoFocus
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer transition-opacity ${isLoading ? 'opacity-50' : 'hover:opacity-80'}`}
+          >
             <PiPaperPlaneRightFill className="text-background" />
           </button>
         </form>
