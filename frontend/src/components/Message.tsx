@@ -91,7 +91,7 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
           </div>
         )}
       </div>
-      <div className='px-4 space-y-2'>
+      <div className='space-y-2'>
         {renderToolOutput()}
       </div>
     </div>
