@@ -77,6 +77,17 @@ export default function Chat() {
     });
   }, [id, updateMessage]);
 
+  // Add a new useEffect to handle scrolling when messages update
+  useEffect(() => {
+    if (session?.messages.length) {
+      const lastMessage = session.messages[session.messages.length - 1];
+      const element = document.getElementById(lastMessage.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    }
+  }, [session?.messages]);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (processingRef.current) return;

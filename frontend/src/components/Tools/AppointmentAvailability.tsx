@@ -47,6 +47,14 @@ export const AppointmentAvailability = ({ output }: { output: string }) => {
           triggered: true,
           toolOutput: []
         })
+
+        // Add scroll after adding message
+        setTimeout(() => {
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
       }
     }
   }

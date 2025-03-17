@@ -1,4 +1,7 @@
+'use client'
+
 import type { JSX } from 'react';
+import { useEffect } from 'react';
 
 import { AppointmentAvailability } from "./Tools/AppointmentAvailability";
 import { AppointmentConfirmation } from "./Tools/AppointmentConfirmation";
@@ -71,8 +74,20 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
     return Components;
   };
 
+  // Update useEffect to handle scrolling
+  useEffect(() => {
+    if (message.id === assistantMessageId && !isComplete) {
+      const element = document.getElementById(message.id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
+      }
+    }
+  }, [message.content, message.id, assistantMessageId, isComplete, message.toolOutput]);
+
   return (
-    <div className="flex flex-col gap-2 animate-fadeIn">
+    <div id={message.id} className="flex flex-col gap-2 animate-fadeIn">
       <div
         className={`
           items-center rounded-[1.5rem] px-4 py-3 text-sm text-wrap
