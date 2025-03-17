@@ -84,7 +84,7 @@ export const Message = ({ message, assistantMessageId, isComplete }: { message: 
       >
         {renderMessageContent()}
         {!isUser && !isComplete && assistantMessageId === message.id && (
-          <div className="inline-flex space-x-1 ml-2">
+          <div className={`inline-flex space-x-1 ${message.content.length > 0 ? 'ml-2' : ''}`}>
             <div className="animate-bounce h-2 w-2 bg-gray-400 rounded-full"></div>
             <div className="animate-bounce h-2 w-2 bg-gray-400 rounded-full animation-delay-200"></div>
             <div className="animate-bounce h-2 w-2 bg-gray-400 rounded-full animation-delay-400"></div>

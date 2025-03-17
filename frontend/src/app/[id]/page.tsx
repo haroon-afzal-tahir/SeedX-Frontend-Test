@@ -210,7 +210,7 @@ export default function Chat() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`bg-foreground p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer transition-opacity ${isLoading ? 'opacity-50' : 'hover:opacity-80'}`}
+            className={`bg-blue-500 p-3 rounded-md absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer transition-opacity ${isLoading ? 'opacity-50' : 'hover:opacity-80'}`}
           >
             <PiPaperPlaneRightFill className="text-background" />
           </button>
