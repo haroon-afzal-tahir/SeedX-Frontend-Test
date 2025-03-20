@@ -1,13 +1,17 @@
+"use client";
+
 import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MdMoreHoriz, MdDelete } from "react-icons/md";
 import { useOutsideClick } from '@/hooks/useOutsideClick';
+import { useDevice } from '@/hooks/useDevice';
+import { useParams, useRouter } from 'next/navigation';
 
 interface SidebarMenuProps {
   sessionId: string;
   openMenuId: string | null;
-  toggleMenu: (id: string, e: React.MouseEvent) => void;
-  handleDeleteSession: (sessionId: string, e: React.MouseEvent) => void;
+  toggleMenu: (id: string) => void;
+  handleDeleteSession: (sessionId: string) => void;
 }
 
 export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSession }: SidebarMenuProps) => {
@@ -15,12 +19,13 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const { isMobile } = useDevice();
+
   useOutsideClick(containerRef, () => {
-    if (openMenuId === sessionId) {
-      toggleMenu(sessionId, {
-        preventDefault: () => { },
-        stopPropagation: () => { },
-      } as React.MouseEvent);
+    if (isMobile) {
+      if (openMenuId === sessionId) {
+        toggleMenu(sessionId);
+      }
     }
   });
 
@@ -33,11 +38,23 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
     }
   }, [openMenuId, sessionId]);
 
+  function handleToggleMenu(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMenu(sessionId);
+  }
+
+  function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    handleDeleteSession(sessionId);
+  }
+
   return (
     <div ref={containerRef} className="relative menu-container">
       <button
         ref={buttonRef}
-        onClick={(e) => toggleMenu(sessionId, e)}
+        onClick={handleToggleMenu}
         className={`
           rounded-lg p-1.5 transition-all duration-200
           ${openMenuId === sessionId
@@ -57,9 +74,10 @@ export const SidebarMenu = ({ sessionId, openMenuId, toggleMenu, handleDeleteSes
             shadow-lg rounded-xl border border-border/40 py-1.5
             animate-fadeIn z-[999]
           "
+          onClick={() => console.log("Menu clicked")}
         >
           <button
-            onClick={(e) => handleDeleteSession(sessionId, e)}
+            onClick={handleDelete}
             className="
               flex items-center gap-2 w-full px-4 py-2.5 text-left
               text-sm text-red-500 hover:bg-red-500/10 transition-all

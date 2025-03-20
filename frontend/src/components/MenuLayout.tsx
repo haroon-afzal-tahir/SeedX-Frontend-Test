@@ -4,13 +4,19 @@ import { IoCarSportSharp } from "react-icons/io5";
 import { BiArrowToRight } from "react-icons/bi";
 import { useSidebar } from "@/hooks/useSidebar";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { useRef } from "react";
 
 export function MenuLayout() {
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar(sidebarRef);
 
   return (
     <>
-      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <Sidebar
+        ref={sidebarRef}
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
       <div className="md:hidden md:flex-1 md:h-full max-w-3xl pt-4">
         <div className="flex items-center justify-center gap-2 relative flex-1">
           <button

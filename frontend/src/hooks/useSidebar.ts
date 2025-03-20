@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, RefObject } from "react";
 import { useDevice } from "./useDevice";
 
-export function useSidebar() {
+export function useSidebar(sidebarRef: RefObject<HTMLElement | null>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { isMobile, isDesktop } = useDevice();
 
@@ -14,16 +14,14 @@ export function useSidebar() {
     }
   }, [isDesktop]);
 
-  // Handle click outside
+  // Handle click outside using ref
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (isMobile) {
-        const target = event.target as HTMLElement;
-        // Check if the click is outside both the sidebar and its overlay
-        const isSidebarClick = target.closest("[data-sidebar]");
-        const isOverlayClick = target.closest("[data-sidebar-overlay]");
+      if (isMobile && sidebarRef.current) {
+        const target = event.target as Node;
 
-        if (!isSidebarClick && !isOverlayClick && isSidebarOpen) {
+        // Check if click is outside the sidebar
+        if (!sidebarRef.current?.contains(target as Node) && isSidebarOpen) {
           setIsSidebarOpen(false);
         }
       }
@@ -33,7 +31,7 @@ export function useSidebar() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isSidebarOpen, isMobile]);
+  }, [isSidebarOpen, isMobile, sidebarRef]);
 
   return {
     isSidebarOpen,

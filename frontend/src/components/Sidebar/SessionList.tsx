@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { SidebarMenu } from "./SidebarMenu";
 
@@ -5,8 +7,8 @@ interface SessionListProps {
   sessions: Session[];
   currentId: string | null;
   openMenuId: string | null;
-  toggleMenu: (id: string, e: React.MouseEvent) => void;
-  handleDeleteSession: (sessionId: string, e: React.MouseEvent) => void;
+  toggleMenu: (id: string) => void;
+  handleDeleteSession: (sessionId: string) => void;
   handleLinkClick: () => void;
 }
 

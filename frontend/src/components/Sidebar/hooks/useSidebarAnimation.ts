@@ -14,7 +14,6 @@ export const useSidebarAnimation = (isOpen: boolean) => {
     function animate(timestamp: number) {
       if (!start) start = timestamp;
       const progress = (timestamp - start) * ANIMATION_SPEED;
-      const distance = target - margin;
 
       const easeOutExpo = (x: number): number => {
         return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
@@ -37,6 +36,7 @@ export const useSidebarAnimation = (isOpen: boolean) => {
     frameId = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(frameId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   return margin;
